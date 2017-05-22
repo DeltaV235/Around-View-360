@@ -20,7 +20,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ARV_0.1.cpp">
+    <ClCompile Include="ARV.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MAIN_0.1.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

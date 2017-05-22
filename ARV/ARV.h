@@ -6,3 +6,8 @@
 #include "opencv2/xfeatures2d.hpp"
 #include "time.h"
 
+using namespace cv;
+using namespace std;
+using namespace cv::xfeatures2d;
+
+Mat findH(Mat src_L, Mat src_R);
