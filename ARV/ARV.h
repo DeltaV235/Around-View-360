@@ -13,7 +13,7 @@ using namespace cv::xfeatures2d;
 class StitchForVideo {
 private:
 	clock_t start, finish;
-	Mat src_L, src_R, gray_R, gray_L, c, d, outimg, H;
+	Mat src_L, src_R, gray_R, gray_L, c, d, outimg, H, result;
 	Ptr<SURF> surf = SURF::create(800);
 	BFMatcher matcher;
 	vector<KeyPoint>key1, key2;
@@ -27,10 +27,20 @@ public:
 		src_L = imread(path, 1);
 		return true;
 	}
+	int setSRC_L(Mat image) 
+	{
+		src_L = image;
+		return true;
+	}
 
 	int setSRC_R(string path)
 	{
 		src_R = imread(path, 1);
+		return true;
+	}
+	int setSRC_R(Mat image)
+	{
+		src_R = image;
 		return true;
 	}
 
@@ -93,9 +103,8 @@ public:
 
 	Mat stitch(int width)
 	{
-		clock_t start, finish;
 		start = clock();
-		Mat result;
+		
 		//cols　列 rows 行
 		warpPerspective(src_R, result, H, Size(2 * src_R.cols - width, src_R.rows));//Size设置结果图像宽度，宽度裁去一部分，e可调
 
