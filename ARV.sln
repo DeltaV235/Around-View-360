@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ARV", "ARV\ARV.vcxproj", "{
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test\test.vcxproj", "{62772C74-B80A-4201-92CB-3FD81AF16726}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup_test", "Setup_test\Setup_test.vdproj", "{2F92A9BA-A044-47B1-BF0A-8C673F644F8D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -24,13 +26,17 @@ Global
 		{700943A6-7B30-47C4-8C97-6552B2822329}.Release|x86.ActiveCfg = Release|Win32
 		{700943A6-7B30-47C4-8C97-6552B2822329}.Release|x86.Build.0 = Release|Win32
 		{62772C74-B80A-4201-92CB-3FD81AF16726}.Debug|x64.ActiveCfg = Debug|x64
-		{62772C74-B80A-4201-92CB-3FD81AF16726}.Debug|x64.Build.0 = Debug|x64
 		{62772C74-B80A-4201-92CB-3FD81AF16726}.Debug|x86.ActiveCfg = Debug|Win32
 		{62772C74-B80A-4201-92CB-3FD81AF16726}.Debug|x86.Build.0 = Debug|Win32
 		{62772C74-B80A-4201-92CB-3FD81AF16726}.Release|x64.ActiveCfg = Release|x64
 		{62772C74-B80A-4201-92CB-3FD81AF16726}.Release|x64.Build.0 = Release|x64
 		{62772C74-B80A-4201-92CB-3FD81AF16726}.Release|x86.ActiveCfg = Release|Win32
 		{62772C74-B80A-4201-92CB-3FD81AF16726}.Release|x86.Build.0 = Release|Win32
+		{2F92A9BA-A044-47B1-BF0A-8C673F644F8D}.Debug|x64.ActiveCfg = Release
+		{2F92A9BA-A044-47B1-BF0A-8C673F644F8D}.Debug|x64.Deploy.0 = Release
+		{2F92A9BA-A044-47B1-BF0A-8C673F644F8D}.Debug|x86.ActiveCfg = Debug
+		{2F92A9BA-A044-47B1-BF0A-8C673F644F8D}.Release|x64.ActiveCfg = Release
+		{2F92A9BA-A044-47B1-BF0A-8C673F644F8D}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

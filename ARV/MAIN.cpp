@@ -12,48 +12,60 @@ int main()
 	
 	cout << "CV_VERSION: " << CV_VERSION << endl;
 
-	StitchForVideo matches_1CR;
-	StitchForVideo matches_1LC;
-	StitchForVideo matches_2CR;
-	StitchForVideo matches_2LC;
+	StitchForVideo stitch_1CR, stitch_1LC, stitch_2CR, stitch_2LC, stitch_UD;
+	int flag = 1;
 
-	matches_1CR.setSRC_L("1C.jpg");
-	matches_1CR.setSRC_R("1R.jpg");
-	matches_1CR.findH("H_1CR.jpg");
+	stitch_1CR.setSRC_L("1C.jpg");
+	stitch_1CR.setSRC_R("1R.jpg");
+	stitch_1CR.findH("H_1CR.jpg");
+	stitch_1CR.show("1CR_H");
 	
+	stitch_1LC.setSRC_L("1L.jpg");
+	stitch_1LC.setSRC_R("1C.jpg");
+	stitch_1LC.findH("H_1LC.jpg");
+	stitch_1LC.show("1LC_H");
 	
-	matches_1LC.setSRC_L("1L.jpg");
-	matches_1LC.setSRC_R("1C.jpg");
-	matches_1LC.findH("H_1LC.jpg");
-	
-	matches_2CR.setSRC_L("2C.jpg");
-	matches_2CR.setSRC_R("2R.jpg");
-	matches_2CR.findH("H_2CR.jpg");
+	stitch_2CR.setSRC_L("2C.jpg");
+	stitch_2CR.setSRC_R("2R.jpg");
+	stitch_2CR.findH("H_2CR.jpg");
+	stitch_2CR.show("2CR_H");
 
-
-	matches_2LC.setSRC_L("2L.jpg");
-	matches_2LC.setSRC_R("2C.jpg");
-	matches_2LC.findH("H_2LC.jpg");
-
-
-
-
+	stitch_2LC.setSRC_L("2L.jpg");
+	stitch_2LC.setSRC_R("2C.jpg");
+	stitch_2LC.findH("H_2LC.jpg");
+	stitch_2LC.show("2LC_H");
 
 	
-	while (1)
-	{
-		Mat result_1CR = matches_1CR.stitch(50);
-		matches_1LC.setSRC_R(result_1CR);
-		Mat result_1_whole = matches_1LC.stitch(50);
+
+
+	
+	//while (1)
+	//{
+		Mat result_1CR = stitch_1CR.stitch(50);
+		stitch_1LC.setSRC_R(result_1CR);
+		Mat result_1_whole = stitch_1LC.stitch(50);
 		imshow("stitch_1_whole", result_1_whole);
 
-		Mat result_2CR = matches_2CR.stitch(50);
-		matches_2LC.setSRC_R(result_2CR);
-		Mat result_2_whole = matches_2LC.stitch(50);
+		Mat result_2CR = stitch_2CR.stitch(50);
+		stitch_2LC.setSRC_R(result_2CR);
+		Mat result_2_whole = stitch_2LC.stitch(50);
 		imshow("stitch_2_whole", result_2_whole);
 
-		waitKey(4000);
-	}
+		if (flag)
+		{
+			stitch_UD.setSRC_L(result_1_whole);
+			stitch_UD.setSRC_R(result_2_whole);
+			stitch_UD.findH("H_UD.jpg");
+			flag = 0;
+		}
+		Mat stitch_whole=stitch_UD.stitch_v(50);
+		imwrite("stitch_whole.jpg", stitch_whole);
+		imshow("stitch_whole", stitch_whole);
+		cout << endl << endl;
+		waitKey(5000);
+	//}
+
+	
 
 	cvWaitKey(0);
 

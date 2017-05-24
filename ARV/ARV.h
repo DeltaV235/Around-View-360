@@ -82,7 +82,7 @@ public:
 		return H;
 	}
 
-	void show()
+	void show(string winName)
 	{
 		vector<Point2f> obj_corners(4);
 		obj_corners[0] = Point(0, 0);
@@ -97,7 +97,7 @@ public:
 		line(outimg, scene_corners[1] + Point2f((float)gray_R.cols, 0), scene_corners[2] + Point2f((float)gray_R.cols, 0), Scalar(0, 255, 0), 2, LINE_AA);
 		line(outimg, scene_corners[2] + Point2f((float)gray_R.cols, 0), scene_corners[3] + Point2f((float)gray_R.cols, 0), Scalar(0, 255, 0), 2, LINE_AA);
 		line(outimg, scene_corners[3] + Point2f((float)gray_R.cols, 0), scene_corners[0] + Point2f((float)gray_R.cols, 0), Scalar(0, 255, 0), 2, LINE_AA);
-		imshow("test for findH", outimg);
+		imshow(winName, outimg);
 
 	}
 
@@ -113,6 +113,24 @@ public:
 		for (int i = 0; i < width; i++)
 		{
 			result.col(src_L.cols - width + i) = (width - i) / (float)width*src_L.col(src_L.cols - width + i) + i / (float)width*result.col(src_L.cols - width + i);  //权重
+		}
+		finish = clock();
+		printf("stitch: %.2f ms\n", (double)(finish - start));
+		return result;
+	}
+
+	Mat stitch_v(int width)
+	{
+		start = clock();
+
+		//cols　列 rows 行
+		warpPerspective(src_R, result, H, Size( src_R.cols , 2*src_R.rows - width));//Size设置结果图像宽度，宽度裁去一部分，e可调
+
+		Mat half(result, Rect(0, 0, src_L.cols, src_L.rows - width));
+		src_L( Range(0, src_L.rows - width), Range::all()).copyTo(half);
+		for (int i = 0; i < width; i++)
+		{
+			result.row(src_L.rows - width + i) = (width - i) / (float)width*src_L.row(src_L.rows - width + i) + i / (float)width*result.row(src_L.rows - width + i);  //权重
 		}
 		finish = clock();
 		printf("stitch: %.2f ms\n", (double)(finish - start));
