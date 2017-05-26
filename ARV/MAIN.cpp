@@ -15,30 +15,57 @@ int main()
 	StitchForVideo stitch_1CR, stitch_1LC, stitch_2CR, stitch_2LC, stitch_UD;
 	int flag = 1;
 
-	stitch_1CR.setSRC_L("1C.jpg");
-	stitch_1CR.setSRC_R("1R.jpg");
-	stitch_1CR.findH("H_1CR.jpg");
-	stitch_1CR.show("1CR_H");
-	
-	stitch_1LC.setSRC_L("1L.jpg");
-	stitch_1LC.setSRC_R("1C.jpg");
-	stitch_1LC.findH("H_1LC.jpg");
-	stitch_1LC.show("1LC_H");
-	
-	stitch_2CR.setSRC_L("2C.jpg");
-	stitch_2CR.setSRC_R("2R.jpg");
-	stitch_2CR.findH("H_2CR.jpg");
-	stitch_2CR.show("2CR_H");
 
-	stitch_2LC.setSRC_L("2L.jpg");
-	stitch_2LC.setSRC_R("2C.jpg");
-	stitch_2LC.findH("H_2LC.jpg");
-	stitch_2LC.show("2LC_H");
-
+	//载入原图
+	stitch_1CR.setSRC_L("src\\1C.jpg");
+	stitch_1CR.setSRC_R("src\\1R.jpg");
+	
+	
+	stitch_1LC.setSRC_L("src\\1L.jpg");
+	stitch_1LC.setSRC_R("src\\1C.jpg");
+	
+	
+	stitch_2CR.setSRC_L("src\\2C.jpg");
+	stitch_2CR.setSRC_R("src\\2R.jpg");
 	
 
-
+	stitch_2LC.setSRC_L("src\\2L.jpg");
+	stitch_2LC.setSRC_R("src\\2C.jpg");
 	
+
+	//计算单应性矩阵
+	if(!stitch_1CR.setH("H\\H_1CR"))
+	{
+		cout << "H=  (PYTHON)" << endl << format(stitch_1CR.getH(), Formatter::FMT_PYTHON) << endl << endl;
+		stitch_1CR.findH("H\\H_1CR");
+		stitch_1CR.show("1CR_H");
+		cout << "H=  (PYTHON)" << endl << format(stitch_2LC.getH(), Formatter::FMT_PYTHON) << endl << endl;
+		
+	}
+	
+	if (!stitch_1LC.setH("H\\H_1LC"))
+	{
+		stitch_1LC.findH("H\\H_1LC");
+		stitch_1LC.show("1LC_H");
+	}
+	
+	if (!stitch_2CR.setH("H\\H_2CR"))
+	{
+		stitch_2CR.findH("H\\H_2CR");
+		stitch_2CR.show("2CR_H");
+	}
+	
+	if (!stitch_2LC.setH("H\\H_2LC"))
+	{
+		stitch_2LC.findH("H\\H_2LC");
+		stitch_2LC.show("2LC_H");
+		
+	}
+	
+
+
+	//拼接
+
 	//while (1)
 	//{
 		Mat result_1CR = stitch_1CR.stitch(50);
@@ -55,7 +82,7 @@ int main()
 		{
 			stitch_UD.setSRC_L(result_1_whole);
 			stitch_UD.setSRC_R(result_2_whole);
-			stitch_UD.findH("H_UD.jpg");
+			stitch_UD.findH("H//H_UD");
 			flag = 0;
 		}
 		Mat stitch_whole=stitch_UD.stitch_v(50);

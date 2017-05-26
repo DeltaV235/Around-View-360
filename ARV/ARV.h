@@ -43,6 +43,18 @@ public:
 		src_R = image;
 		return true;
 	}
+	int setH(string path)
+	{
+		FileStorage fs(path+".xml", FileStorage::READ);
+		
+		fs[path] >> H;
+		
+		return true;
+	}
+	Mat getH()
+	{
+		return H;
+	}
 
 	Mat findH(string path)
 	{
@@ -77,8 +89,10 @@ public:
 		finish = clock();
 		cout << "findH: " << (double)(finish - start) << " ms" << endl;
 
-
-		imwrite(path, H);
+		FileStorage fs(path+".xml", FileStorage::WRITE);
+		fs << path <<H;
+		fs.release();
+		
 		return H;
 	}
 
