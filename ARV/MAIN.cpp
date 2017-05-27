@@ -1,7 +1,6 @@
-//ARV_0.1.cpp
+//main.cpp
 
 #include "ARV.h"
-
 
 
 
@@ -34,30 +33,30 @@ int main()
 	
 
 	//计算单应性矩阵
-	if(!stitch_1CR.setH("H\\H_1CR"))
+	if(!stitch_1CR.setH("H\\H_1CR.xml"))
 	{
 		cout << "H=  (PYTHON)" << endl << format(stitch_1CR.getH(), Formatter::FMT_PYTHON) << endl << endl;
-		stitch_1CR.findH("H\\H_1CR");
+		stitch_1CR.findH("H\\H_1CR.xml");
 		stitch_1CR.show("1CR_H");
-		cout << "H=  (PYTHON)" << endl << format(stitch_2LC.getH(), Formatter::FMT_PYTHON) << endl << endl;
+		cout << "H=  (PYTHON)" << endl << format(stitch_1CR.getH(), Formatter::FMT_PYTHON) << endl << endl;
 		
 	}
 	
-	if (!stitch_1LC.setH("H\\H_1LC"))
+	if (!stitch_1LC.setH("H\\H_1LC.xml"))
 	{
-		stitch_1LC.findH("H\\H_1LC");
+		stitch_1LC.findH("H\\H_1LC.xml");
 		stitch_1LC.show("1LC_H");
 	}
 	
-	if (!stitch_2CR.setH("H\\H_2CR"))
+	if (!stitch_2CR.setH("H\\H_2CR.xml"))
 	{
-		stitch_2CR.findH("H\\H_2CR");
+		stitch_2CR.findH("H\\H_2CR.xml");
 		stitch_2CR.show("2CR_H");
 	}
 	
-	if (!stitch_2LC.setH("H\\H_2LC"))
+	if (!stitch_2LC.setH("H\\H_2LC.xml"))
 	{
-		stitch_2LC.findH("H\\H_2LC");
+		stitch_2LC.findH("H\\H_2LC.xml");
 		stitch_2LC.show("2LC_H");
 		
 	}
@@ -66,8 +65,10 @@ int main()
 
 	//拼接
 
-	//while (1)
-	//{
+	while (1)
+	{
+		clock_t start, end;
+		start = getTickCount();
 		Mat result_1CR = stitch_1CR.stitch(50);
 		stitch_1LC.setSRC_R(result_1CR);
 		Mat result_1_whole = stitch_1LC.stitch(50);
@@ -78,19 +79,21 @@ int main()
 		Mat result_2_whole = stitch_2LC.stitch(50);
 		imshow("stitch_2_whole", result_2_whole);
 
-		if (flag)
+
+		stitch_UD.setSRC_L(result_1_whole);
+		stitch_UD.setSRC_R(result_2_whole);
+		if (!stitch_UD.setH("H\\H_UD.xml"))
 		{
-			stitch_UD.setSRC_L(result_1_whole);
-			stitch_UD.setSRC_R(result_2_whole);
-			stitch_UD.findH("H//H_UD");
-			flag = 0;
+			stitch_UD.findH("H\\H_UD.xml");
 		}
 		Mat stitch_whole=stitch_UD.stitch_v(50);
 		imwrite("stitch_whole.jpg", stitch_whole);
 		imshow("stitch_whole", stitch_whole);
 		cout << endl << endl;
-		waitKey(5000);
-	//}
+		end = getTickCount();
+		cout << (double)((end - start)/getTickFrequency()) << endl << endl;
+		waitKey(80);
+	}
 
 	
 

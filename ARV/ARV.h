@@ -6,9 +6,18 @@
 #include "opencv2/xfeatures2d.hpp"
 #include "time.h"
 
+#define SHOW_TIME 1
+
 using namespace cv;
 using namespace std;
 using namespace cv::xfeatures2d;
+
+
+
+
+void getAvgTime();
+void getAvgFps();
+
 
 class StitchForVideo {
 private:
@@ -22,12 +31,17 @@ private:
 	vector<Point2f> obj, scene;
 
 public:
+
+	StitchForVideo()
+	{
+
+	}
 	int setSRC_L(string path)
 	{
 		src_L = imread(path, 1);
 		return true;
 	}
-	int setSRC_L(Mat image) 
+	int setSRC_L(Mat image)
 	{
 		src_L = image;
 		return true;
@@ -45,11 +59,12 @@ public:
 	}
 	int setH(string path)
 	{
-		FileStorage fs(path+".xml", FileStorage::READ);
-		
-		fs[path] >> H;
-		
-		return true;
+		FileStorage fs;
+		fs.open(path, FileStorage::READ);
+		fs["H_MAT_DATA"] >> H;
+		bool flag = fs.isOpened();
+		fs.release();
+		return flag;
 	}
 	Mat getH()
 	{
@@ -76,7 +91,7 @@ public:
 			good_matches.push_back(matches[i]);
 		}
 		//绘制匹配点
-		drawMatches(gray_R, key1, gray_L, key2, good_matches, outimg, 
+		drawMatches(gray_R, key1, gray_L, key2, good_matches, outimg,
 			Scalar::all(-1), Scalar::all(-1), vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
 
 		for (size_t i = 0; i < good_matches.size(); i++)
@@ -89,10 +104,10 @@ public:
 		finish = clock();
 		cout << "findH: " << (double)(finish - start) << " ms" << endl;
 
-		FileStorage fs(path+".xml", FileStorage::WRITE);
-		fs << path <<H;
+		FileStorage fs(path, FileStorage::WRITE);
+		fs << "H_MAT_DATA" << H;
 		fs.release();
-		
+
 		return H;
 	}
 
@@ -115,12 +130,12 @@ public:
 
 	}
 
-	Mat stitch(int width)
+	inline	Mat stitch(int width, int flag = 0)
 	{
 		start = clock();
-		
+
 		//cols　列 rows 行
-		warpPerspective(src_R, result, H, Size(2 * src_R.cols - width, src_R.rows));//Size设置结果图像宽度，宽度裁去一部分，e可调
+		warpPerspective(src_R, result, H, Size(1.5 * src_R.cols - width, src_R.rows));//Size设置结果图像宽度，宽度裁去一部分，e可调
 
 		Mat half(result, Rect(0, 0, src_L.cols - width, src_L.rows));
 		src_L(Range::all(), Range(0, src_L.cols - width)).copyTo(half);
@@ -129,25 +144,31 @@ public:
 			result.col(src_L.cols - width + i) = (width - i) / (float)width*src_L.col(src_L.cols - width + i) + i / (float)width*result.col(src_L.cols - width + i);  //权重
 		}
 		finish = clock();
-		printf("stitch: %.2f ms\n", (double)(finish - start));
+		if (flag)
+		{
+			printf("stitch: %.2f ms\n", (double)(finish - start));
+		}
 		return result;
 	}
 
-	Mat stitch_v(int width)
+	inline Mat stitch_v(int width, int flag = 0)
 	{
 		start = clock();
 
 		//cols　列 rows 行
-		warpPerspective(src_R, result, H, Size( src_R.cols , 2*src_R.rows - width));//Size设置结果图像宽度，宽度裁去一部分，e可调
+		warpPerspective(src_R, result, H, Size(src_R.cols, 1.5*src_R.rows - width));//Size设置结果图像宽度，宽度裁去一部分，e可调
 
 		Mat half(result, Rect(0, 0, src_L.cols, src_L.rows - width));
-		src_L( Range(0, src_L.rows - width), Range::all()).copyTo(half);
+		src_L(Range(0, src_L.rows - width), Range::all()).copyTo(half);
 		for (int i = 0; i < width; i++)
 		{
 			result.row(src_L.rows - width + i) = (width - i) / (float)width*src_L.row(src_L.rows - width + i) + i / (float)width*result.row(src_L.rows - width + i);  //权重
 		}
 		finish = clock();
-		printf("stitch: %.2f ms\n", (double)(finish - start));
+		if (flag)
+		{
+			printf("stitch: %.2f ms\n", (double)(finish - start));
+		}
 		return result;
 	}
 };
