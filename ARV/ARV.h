@@ -7,6 +7,7 @@
 #include "time.h"
 
 #define SHOW_TIME 1
+#define TIME_ARR_SIZE 5
 
 using namespace cv;
 using namespace std;
@@ -14,9 +15,18 @@ using namespace cv::xfeatures2d;
 
 
 
-
-void getAvgTime();
-void getAvgFps();
+class Time {
+private:
+	double start, end, data[TIME_ARR_SIZE] = { 0 }, sum;
+	int count=0, i;
+public:
+	void setStartPos();
+	void setEndPos();
+	void getAvgTime();
+	void getAvgFps();
+	void getCurTime();
+	double getSum(double data[]);
+};
 
 
 class StitchForVideo {

@@ -64,10 +64,14 @@ int main()
 
 
 	//Æ´½Ó
+	clock_t start, end;
+
+	Time time;
 
 	while (1)
 	{
-		clock_t start, end;
+		
+		time.setStartPos();
 		start = getTickCount();
 		Mat result_1CR = stitch_1CR.stitch(50);
 		stitch_1LC.setSRC_R(result_1CR);
@@ -89,10 +93,13 @@ int main()
 		Mat stitch_whole=stitch_UD.stitch_v(50);
 		imwrite("stitch_whole.jpg", stitch_whole);
 		imshow("stitch_whole", stitch_whole);
-		cout << endl << endl;
+		time.setEndPos();
+		time.getAvgTime();
+		time.getCurTime();
+		
 		end = getTickCount();
-		cout << (double)((end - start)/getTickFrequency()) << endl << endl;
-		waitKey(80);
+		//cout << (double)((end - start)/getTickFrequency()*1000)<< "ms" << endl << endl;
+		waitKey(1000);
 	}
 
 	
