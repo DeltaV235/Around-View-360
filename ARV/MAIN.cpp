@@ -11,6 +11,7 @@ int main()
 	
 	cout << "CV_VERSION: " << CV_VERSION << endl;
 
+
 	StitchForVideo stitch_1CR, stitch_1LC, stitch_2CR, stitch_2LC, stitch_UD;
 	int flag = 1;
 
@@ -90,7 +91,7 @@ int main()
 		{
 			stitch_UD.findH("H\\H_UD.xml");
 		}
-		Mat stitch_whole=stitch_UD.stitch_v(50);
+		Mat stitch_whole=stitch_UD.stitch_v(100);
 		imwrite("stitch_whole.jpg", stitch_whole);
 		imshow("stitch_whole", stitch_whole);
 		time.setEndPos();
@@ -99,12 +100,62 @@ int main()
 		
 		end = getTickCount();
 		//cout << (double)((end - start)/getTickFrequency()*1000)<< "ms" << endl << endl;
-		waitKey(1000);
+		waitKey(50);
 	}
 
-	
-
 	cvWaitKey(0);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	//ÉãÏñÍ·Æ´½Ó
+
+	//VideoCapture capture(0);
+	//Mat frame,src;
+	//StitchForVideo video;
+	//Time time;
+	//capture >> frame;
+	//imwrite("src/src_frame.jpg", frame);
+	//getchar();
+	//src = imread("src/src_frame.jpg");
+	//capture >> frame;
+	//video.setSRC_L(src);
+	//video.setSRC_R(frame);
+	//video.findH("H/H_frame.xml");
+	//video.show("H");
+
+	//while(1)
+	//{
+	//	time.setStartPos();
+	//	capture >> frame;
+	//	video.setSRC_R(frame);
+	//	imshow("capture", video.stitch(30));
+	//	time.setEndPos();
+	//	time.getAvgTime();
+	//	time.getCurTime();
+	//	waitKey(40);
+	//}
+	//
+	//
+
+
+
+
 
 /********************************************************************************************
 	Mat gray_R, gray_C,gray_L;
@@ -166,9 +217,6 @@ int main()
 
 	
 	
-	
-	
-
 	
 
 	//Æ´½Ó
