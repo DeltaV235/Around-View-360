@@ -1,73 +1,28 @@
-#pragma once
-#include "iostream"
-#include "opencv2/highgui.hpp"
-#include "opencv2/calib3d.hpp"
-#include "opencv2/imgproc.hpp"
-#include "opencv2/xfeatures2d.hpp"
-#include "time.h"
-
-#define SHOW_TIME 1
-#define TIME_ARR_SIZE 5
-
-using namespace cv;
-using namespace std;
-using namespace cv::xfeatures2d;
+#include "StitchForVideo.h"
 
 
-
-class Time {
-private:
-	double start, end, data[TIME_ARR_SIZE] = { 0 }, sum;
-	int count=0, i;
-public:
-	void setStartPos();
-	void setEndPos();
-	void getAvgTime();
-	void getAvgFps();
-	void getCurTime();
-	double getSum(double data[]);
-};
-
-
-class StitchForVideo {
-private:
-	clock_t start, finish;
-	Mat src_L, src_R, gray_R, gray_L, c, d, outimg, H, result;
-	Ptr<SURF> surf = SURF::create(800);
-	BFMatcher matcher;
-	vector<KeyPoint>key1, key2;
-	vector<DMatch> matches, good_matches;
-	int ptsPairs = 0;
-	vector<Point2f> obj, scene;
-
-public:
-
-	StitchForVideo()
-	{
-
-	}
-	int setSRC_L(string path)
+	int StitchForVideo::setSRC_L(string path)
 	{
 		src_L = imread(path, 1);
 		return true;
 	}
-	int setSRC_L(Mat image)
+	int StitchForVideo::setSRC_L(Mat image)
 	{
 		src_L = image;
 		return true;
 	}
 
-	int setSRC_R(string path)
+	int StitchForVideo::setSRC_R(string path)
 	{
 		src_R = imread(path, 1);
 		return true;
 	}
-	int setSRC_R(Mat image)
+	int StitchForVideo::setSRC_R(Mat image)
 	{
 		src_R = image;
 		return true;
 	}
-	int setH(string path)
+	int StitchForVideo::setH(string path)
 	{
 		FileStorage fs;
 		fs.open(path, FileStorage::READ);
@@ -76,12 +31,12 @@ public:
 		fs.release();
 		return flag;
 	}
-	Mat getH()
+	Mat StitchForVideo::getH()
 	{
 		return H;
 	}
 
-	Mat findH(string path)
+	Mat StitchForVideo::findH(string path)
 	{
 		start = clock();
 		//将原图转化成灰度图
@@ -121,7 +76,7 @@ public:
 		return H;
 	}
 
-	void show(string winName)
+	void StitchForVideo::show(string winName)
 	{
 		vector<Point2f> obj_corners(4);
 		obj_corners[0] = Point(0, 0);
@@ -140,7 +95,7 @@ public:
 
 	}
 
-	inline	Mat stitch(int width, int flag = 0)
+	Mat StitchForVideo::stitch(int width, int flag )
 	{
 		start = clock();
 
@@ -161,7 +116,7 @@ public:
 		return result;
 	}
 
-	inline Mat stitch_v(int width, int flag = 0)
+	Mat StitchForVideo::stitch_v(int width, int flag )
 	{
 		start = clock();
 
@@ -181,4 +136,3 @@ public:
 		}
 		return result;
 	}
-};

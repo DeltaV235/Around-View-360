@@ -1,6 +1,7 @@
 //main.cpp
 
-#include "ARV.h"
+#include "timedetection.h"
+#include "StitchForVideo.h"
 
 
 
@@ -67,7 +68,7 @@ int main()
 	//Æ´½Ó
 	clock_t start, end;
 
-	Time time;
+	TimeDetection time;
 
 	while (1)
 	{
@@ -96,8 +97,10 @@ int main()
 		imshow("stitch_whole", stitch_whole);
 		time.setEndPos();
 		time.getAvgTime();
+		time.getAvgFps();
 		time.getCurTime();
 		
+
 		end = getTickCount();
 		//cout << (double)((end - start)/getTickFrequency()*1000)<< "ms" << endl << endl;
 		waitKey(50);
