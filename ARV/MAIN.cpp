@@ -4,104 +4,52 @@
 #include "StitchForVideo.h"
 
 
-
-
-
 int main()
 {
-	
 	cout << "CV_VERSION: " << CV_VERSION << endl;
 
-
-	StitchForVideo stitch_1CR, stitch_1LC, stitch_2CR, stitch_2LC, stitch_UD;
+	StitchForVideo stitch_1CR, stitch_1LC, stitch_2CR, stitch_2LC, stitch_UD;	//实例化的StitchForVideo类的对象
 	int flag = 1;
 
 
 	//载入原图
 	stitch_1CR.setSRC_L("src\\1C.jpg");
-	stitch_1CR.setSRC_R("src\\1R.jpg");
-	
+	stitch_1CR.setSRC_R("src\\1R.jpg").findH("H\\H_1CR.xml", STITCH_SURF, IS_REBUILD_H);
 	
 	stitch_1LC.setSRC_L("src\\1L.jpg");
-	stitch_1LC.setSRC_R("src\\1C.jpg");
-	
+	stitch_1LC.setSRC_R("src\\1C.jpg").findH("H\\H_1LC.xml", STITCH_SURF, IS_REBUILD_H);
 	
 	stitch_2CR.setSRC_L("src\\2C.jpg");
-	stitch_2CR.setSRC_R("src\\2R.jpg");
+	stitch_2CR.setSRC_R("src\\2R.jpg").findH("H\\H_2CR.xml", STITCH_SURF, IS_REBUILD_H);
 	
-
 	stitch_2LC.setSRC_L("src\\2L.jpg");
-	stitch_2LC.setSRC_R("src\\2C.jpg");
-	
-
-	//计算单应性矩阵
-	if(!stitch_1CR.setH("H\\H_1CR.xml"))
-	{
-		cout << "H=  (PYTHON)" << endl << format(stitch_1CR.getH(), Formatter::FMT_PYTHON) << endl << endl;
-		stitch_1CR.findH("H\\H_1CR.xml");
-		stitch_1CR.show("1CR_H");
-		cout << "H=  (PYTHON)" << endl << format(stitch_1CR.getH(), Formatter::FMT_PYTHON) << endl << endl;
-		
-	}
-	
-	if (!stitch_1LC.setH("H\\H_1LC.xml"))
-	{
-		stitch_1LC.findH("H\\H_1LC.xml");
-		stitch_1LC.show("1LC_H");
-	}
-	
-	if (!stitch_2CR.setH("H\\H_2CR.xml"))
-	{
-		stitch_2CR.findH("H\\H_2CR.xml");
-		stitch_2CR.show("2CR_H");
-	}
-	
-	if (!stitch_2LC.setH("H\\H_2LC.xml"))
-	{
-		stitch_2LC.findH("H\\H_2LC.xml");
-		stitch_2LC.show("2LC_H");
-		
-	}
-	
+	stitch_2LC.setSRC_R("src\\2C.jpg").findH("H\\H_2LC.xml", STITCH_SURF, IS_REBUILD_H);
 
 
 	//拼接
-	clock_t start, end;
+	//clock_t start, end;
 
 	TimeDetection time;
 
 	while (1)
 	{
-		
+		//start = getTickCount();
 		time.setStartPos();
-		start = getTickCount();
-		Mat result_1CR = stitch_1CR.stitch(50);
-		stitch_1LC.setSRC_R(result_1CR);
-		Mat result_1_whole = stitch_1LC.stitch(50);
-		imshow("stitch_1_whole", result_1_whole);
+		stitch_1CR.stitch(50);
+		stitch_1LC.setSRC_R(stitch_1CR.getResult());				//如果在这里再findH会如何？
+		imshow("stitch_1_whole", stitch_1LC.stitch(50));
+		stitch_2CR.stitch(50);
+		stitch_2LC.setSRC_R(stitch_2CR.getResult());
+		imshow("stitch_2_whole", stitch_2LC.stitch(50));
 
-		Mat result_2CR = stitch_2CR.stitch(50);
-		stitch_2LC.setSRC_R(result_2CR);
-		Mat result_2_whole = stitch_2LC.stitch(50);
-		imshow("stitch_2_whole", result_2_whole);
-
-
-		stitch_UD.setSRC_L(result_1_whole);
-		stitch_UD.setSRC_R(result_2_whole);
-		if (!stitch_UD.setH("H\\H_UD.xml"))
-		{
-			stitch_UD.findH("H\\H_UD.xml");
-		}
-		Mat stitch_whole=stitch_UD.stitch_v(100);
-		imwrite("stitch_whole.jpg", stitch_whole);
-		imshow("stitch_whole", stitch_whole);
-		time.setEndPos();
-		time.getAvgTime();
-		time.getAvgFps();
-		time.getCurTime();
+		stitch_UD.setSRC_L(stitch_1LC.getResult());
+		stitch_UD.setSRC_R(stitch_2LC.getResult()).findH("H\\H_UD.xml", STITCH_SURF, false);
 		
-
-		end = getTickCount();
+		imwrite("stitch_whole.jpg", stitch_UD.stitch_v(100));
+		imshow("stitch_whole", stitch_UD.getResult());
+		time.setEndPos().getAvgTime().getAvgFps().getCurTime();
+		
+		//end = getTickCount();
 		//cout << (double)((end - start)/getTickFrequency()*1000)<< "ms" << endl << endl;
 		waitKey(50);
 	}
@@ -109,6 +57,47 @@ int main()
 	cvWaitKey(0);
 
 
+
+	//若存在单应性矩阵则导入，否则计算，默认情况 (isRebuild=true) 下每次运行都会重新计算 H
+
+	//stitch_1CR.findH("H\\H_1CR.xml", STITCH_SURF, false);
+	//stitch_1LC.findH("H\\H_1LC.xml", STITCH_SURF, false);
+	//stitch_2CR.findH("H\\H_2CR.xml", STITCH_SURF, false);
+	//stitch_2LC.findH("H\\H_2LC.xml", STITCH_SURF, false);
+
+
+	//计算单应性矩阵
+	
+	/****************************************************************************************
+	if(!stitch_1CR.setH("H\\H_1CR.xml"))
+	{
+		cout << "H=  (PYTHON)" << endl << format(stitch_1CR.getH(), Formatter::FMT_PYTHON) << endl << endl;
+		stitch_1CR.findH("H\\H_1CR.xml",STITCH_SURF,false);
+		stitch_1CR.show("1CR_H");
+		cout << "H=  (PYTHON)" << endl << format(stitch_1CR.getH(), Formatter::FMT_PYTHON) << endl << endl;
+		
+	}
+	
+	if (!stitch_1LC.setH("H\\H_1LC.xml"))
+	{
+		stitch_1LC.findH("H\\H_1LC.xml",STITCH_SURF,false);
+		stitch_1LC.show("1LC_H");
+	}
+	
+	if (!stitch_2CR.setH("H\\H_2CR.xml"))
+	{
+		stitch_2CR.findH("H\\H_2CR.xml", STITCH_SURF,false);
+		stitch_2CR.show("2CR_H");
+	}
+	
+	if (!stitch_2LC.setH("H\\H_2LC.xml"))
+	{
+		stitch_2LC.findH("H\\H_2LC.xml", STITCH_SURF,false);
+		stitch_2LC.show("2LC_H");
+		
+	}
+	
+	***********************************************************************************************/
 
 
 
