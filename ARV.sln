@@ -1,13 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ARV", "ARV\ARV.vcxproj", "{700943A6-7B30-47C4-8C97-6552B2822329}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test\test.vcxproj", "{62772C74-B80A-4201-92CB-3FD81AF16726}"
-EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup_test", "Setup_test\Setup_test.vdproj", "{2F92A9BA-A044-47B1-BF0A-8C673F644F8D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,13 +30,11 @@ Global
 		{62772C74-B80A-4201-92CB-3FD81AF16726}.Release|x64.Build.0 = Release|x64
 		{62772C74-B80A-4201-92CB-3FD81AF16726}.Release|x86.ActiveCfg = Release|Win32
 		{62772C74-B80A-4201-92CB-3FD81AF16726}.Release|x86.Build.0 = Release|Win32
-		{2F92A9BA-A044-47B1-BF0A-8C673F644F8D}.Debug|x64.ActiveCfg = Release
-		{2F92A9BA-A044-47B1-BF0A-8C673F644F8D}.Debug|x64.Deploy.0 = Release
-		{2F92A9BA-A044-47B1-BF0A-8C673F644F8D}.Debug|x86.ActiveCfg = Debug
-		{2F92A9BA-A044-47B1-BF0A-8C673F644F8D}.Release|x64.ActiveCfg = Release
-		{2F92A9BA-A044-47B1-BF0A-8C673F644F8D}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9025B92C-01C2-419B-8622-8A455500C4D2}
 	EndGlobalSection
 EndGlobal
