@@ -21,8 +21,10 @@
   <ItemGroup>
     <ClInclude Include="StitchForVideo.h" />
     <ClInclude Include="TimeDetection.h" />
+    <ClInclude Include="CamCapture.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CamCapture.cpp" />
     <ClCompile Include="StitchForVideo.cpp" />
     <ClCompile Include="TimeDetection.cpp" />
     <ClCompile Include="main.cpp" />
@@ -32,6 +34,7 @@
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>ARV</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <ProjectName>Stitch</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

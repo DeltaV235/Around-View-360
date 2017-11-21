@@ -44,4 +44,5 @@ public:
 	Mat stitch(int width, int flag = 0);		//水平拼接、融合对象中的两幅图片(src_L & src_R) flag==1时，打印出处理所用的总时间
 	Mat stitch_v(int width, int flag = 0);		//竖直拼接、融合对象中的两幅图片(src_L & src_R) flag==1时，打印出处理所用的总时间
 	Mat getResult();
+	void makeVideo(string pathL,string pathR);	//两段视频的拼接
 };

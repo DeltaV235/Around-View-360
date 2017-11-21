@@ -9,7 +9,6 @@
 
 using namespace cv;
 
-
 #define SHOW_TIME 1
 #define TIME_ARR_SIZE 10
 

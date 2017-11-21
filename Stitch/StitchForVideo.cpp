@@ -187,3 +187,52 @@
 	{
 		return result;
 	}
+
+	void StitchForVideo::makeVideo(string pathL, string pathR)
+	{	
+		//定义相关的VideoCapture对象
+		VideoCapture captureL, captureR;
+		//读取视频文件
+		captureL.open(pathL);
+		captureR.open(pathR);
+		//判断视频流读取是否正确
+		if (!(captureL.isOpened() && captureR.isOpened())) 
+			cout << "Fail to open the video!" << endl;
+		//获取视频相关信息  总帧数
+		unsigned int totalFrameL = captureL.get(CV_CAP_PROP_FRAME_COUNT);
+		unsigned int totalFrameR = captureR.get(CV_CAP_PROP_FRAME_COUNT);
+		cout << "Left Video has " << totalFrameL << " frames." << endl;
+		cout << "Right Video has " << totalFrameR << " frames" << endl;	
+		//获取视频相关信息  帧像素宽/高
+		int frameHeightL, frameHeightR, frameWidthL, frameWidthR;
+		frameHeightL = captureL.get(CV_CAP_PROP_FRAME_HEIGHT);
+		frameHeightR = captureR.get(CV_CAP_PROP_FRAME_HEIGHT);
+		frameWidthL = captureL.get(CV_CAP_PROP_FRAME_WIDTH);
+		frameWidthR = captureR.get(CV_CAP_PROP_FRAME_WIDTH);
+		cout << "frameHeigthL = " << frameHeightL << endl;
+		cout << "frameHeigthR = " << frameHeightR << endl;
+		cout << "frameWidthL = " << frameWidthL << endl;
+		cout << "frameWidthR = " << frameWidthR << endl;
+		//获取视频相关信息  帧率
+		double frameRateL = captureL.get(CV_CAP_PROP_FPS);
+		double frameRateR = captureR.get(CV_CAP_PROP_FPS);
+		cout << "FPS_L = " << frameRateL << endl;
+		cout << "FPS_R = " << frameRateR << endl;
+		//read方法获取显示帧
+		long nCount = 1;
+		Mat frameImage;
+		while (true) {
+			cout << "		Current frame:" << nCount << endl;
+			captureL >> frameImage;
+			//判断文件是否读取完
+			if (!frameImage.empty())
+				imshow("frameImg", frameImage);
+			else
+				break;
+			if (char(waitKey(1)) == 'q')
+				break;
+			nCount++;
+		}
+		captureL.release();
+		captureR.release();
+	}

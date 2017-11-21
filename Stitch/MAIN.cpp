@@ -8,6 +8,9 @@ int main()
 {
 	cout << "CV_VERSION: " << CV_VERSION << endl;
 
+
+
+
 	StitchForVideo stitch_1CR, stitch_1LC, stitch_2CR, stitch_2LC, stitch_UD;	//实例化的StitchForVideo类的对象
 	int flag = 1;
 
