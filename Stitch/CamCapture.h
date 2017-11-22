@@ -1,6 +1,6 @@
 #pragma once
 
-#include "StitchForVideo.h"
+#include "StitchFrame.h"
 
 
 class CamCapture

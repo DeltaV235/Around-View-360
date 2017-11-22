@@ -14,29 +14,4 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
   </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TimeDetection.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="CamCapture.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="StitchFrame.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="TimeDetection.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="CamCapture.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="StitchFrame.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-  </ItemGroup>
 </Project>

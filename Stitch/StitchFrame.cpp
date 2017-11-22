@@ -1,35 +1,35 @@
-#include "StitchForVideo.h"
+#include "StitchFrame.h"
 
 
-	StitchForVideo& StitchForVideo::setSRC_L(string path)
+	StitchFrame& StitchFrame::setSRC_L(string path)
 	{
 		src_L = imread(path, 1);
 		return *this;
 	}
 
 
-	StitchForVideo& StitchForVideo::setSRC_L(Mat image)
+	StitchFrame& StitchFrame::setSRC_L(Mat image)
 	{
 		src_L = image;
 		return *this;
 	}
 
 
-	StitchForVideo& StitchForVideo::setSRC_R(string path)
+	StitchFrame& StitchFrame::setSRC_R(string path)
 	{
 		src_R = imread(path, 1);
 		return *this;
 	}
 
 
-	StitchForVideo& StitchForVideo::setSRC_R(Mat image)
+	StitchFrame& StitchFrame::setSRC_R(Mat image)
 	{
 		src_R = image;
 		return *this;
 	}
 
 
-	bool StitchForVideo::setH(string path)
+	bool StitchFrame::setH(string path)
 	{
 		FileStorage fs;
 		fs.open(path, FileStorage::READ);
@@ -40,13 +40,13 @@
 	}
 
 
-	Mat StitchForVideo::getH()
+	Mat StitchFrame::getH()
 	{
 		return H;
 	}
 
 
-	Mat StitchForVideo::findH(string path,int flag,bool isRebuild)
+	Mat StitchFrame::findH(string path,int flag,bool isRebuild)
 	{
 		if (setH(path) == true && isRebuild==false) {
 			return H;
@@ -102,7 +102,7 @@
 	}
 
 
-	void StitchForVideo::show(string winName)
+	void StitchFrame::show(string winName)
 	{
 		vector<Point2f> obj_corners(4);
 		obj_corners[0] = Point(0, 0);
@@ -122,7 +122,7 @@
 	}
 
 
-	Mat StitchForVideo::stitch(int width, int flag)
+	Mat StitchFrame::stitch(int width, int flag)
 	{
 		start = clock();
 
@@ -161,7 +161,7 @@
 	}
 
 
-	Mat StitchForVideo::stitch_v(int width, int flag)
+	Mat StitchFrame::stitch_v(int width, int flag)
 	{
 		start = clock();
 
@@ -183,12 +183,12 @@
 		return result;
 	}
 
-	Mat StitchForVideo::getResult()
+	Mat StitchFrame::getResult()
 	{
 		return result;
 	}
 
-	void StitchForVideo::makeVideo(string pathL, string pathR)
+	void StitchFrame::makeVideo(string pathL, string pathR)
 	{	
 		//定义相关的VideoCapture对象
 		VideoCapture captureL, captureR;
