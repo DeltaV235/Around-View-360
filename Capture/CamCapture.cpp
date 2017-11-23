@@ -1,6 +1,8 @@
+#include "stdafx.h"
 #include "CamCapture.h"
 
-CamCapture & CamCapture::capture(int camNum, int Width, int Heigth)
+
+ CamCapture & CamCapture::capture(int camNum, int Width, int Heigth)
 {	
 	VideoCapture capture(camNum);
 	capture.set(CV_CAP_PROP_FRAME_WIDTH, Width);

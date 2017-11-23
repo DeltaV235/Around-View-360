@@ -1,4 +1,4 @@
-
+#include "stdafx.h"
 #include "TimeDetection.h"			// 头文件名不区分大小写
 
 

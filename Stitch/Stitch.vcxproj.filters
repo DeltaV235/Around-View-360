@@ -21,10 +21,10 @@
     <ClCompile Include="TimeDetection.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="CamCapture.cpp">
+    <ClCompile Include="StitchFrame.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="StitchFrame.cpp">
+    <ClCompile Include="stdafx.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -32,10 +32,13 @@
     <ClInclude Include="TimeDetection.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="CamCapture.h">
+    <ClInclude Include="StitchFrame.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="StitchFrame.h">
+    <ClInclude Include="stdafx.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

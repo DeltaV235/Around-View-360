@@ -1,11 +1,6 @@
 #pragma once
 
-
-
-#include <iostream>
-#include <opencv2\core\cvstd.hpp>
-#include <opencv2\core\utility.hpp>
-
+#include "stdafx.h"
 
 using namespace cv;
 

@@ -1,5 +1,5 @@
 //main.cpp
-
+#include "stdafx.h"
 #include "timedetection.h"
 #include "StitchFrame.h"
 
@@ -7,8 +7,6 @@
 int main()
 {
 	cout << "CV_VERSION: " << CV_VERSION << endl;
-
-
 
 
 	StitchFrame stitch_1CR, stitch_1LC, stitch_2CR, stitch_2LC, stitch_UD;	//实例化的StitchFrame类的对象
