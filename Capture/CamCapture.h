@@ -10,6 +10,6 @@ private:
 	//VideoCapture videoCapture(0);
 public:
 	CamCapture& videoSave();
-	CamCapture& capture(int camNum,int Width,int Heigth);
+	CamCapture& capture(int camNum, int width, int heigth, double fps, string savePath);
 
 };
