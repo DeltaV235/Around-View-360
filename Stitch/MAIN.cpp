@@ -1,14 +1,15 @@
 //main.cpp
-
+#include "stdafx.h"
 #include "timedetection.h"
-#include "StitchForVideo.h"
+#include "StitchFrame.h"
 
 
 int main()
 {
 	cout << "CV_VERSION: " << CV_VERSION << endl;
 
-	StitchForVideo stitch_1CR, stitch_1LC, stitch_2CR, stitch_2LC, stitch_UD;	//实例化的StitchForVideo类的对象
+
+	StitchFrame stitch_1CR, stitch_1LC, stitch_2CR, stitch_2LC, stitch_UD;	//实例化的StitchFrame类的对象
 	int flag = 1;
 
 
@@ -106,7 +107,7 @@ int main()
 
 	//VideoCapture capture(0);
 	//Mat frame,src;
-	//StitchForVideo video;
+	//StitchFrame video;
 	//Time time;
 	//capture >> frame;
 	//imwrite("src/src_frame.jpg", frame);

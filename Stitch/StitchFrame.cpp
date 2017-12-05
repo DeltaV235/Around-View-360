@@ -1,35 +1,36 @@
-#include "StitchForVideo.h"
+#include "stdafx.h"
+#include "StitchFrame.h"
 
 
-	StitchForVideo& StitchForVideo::setSRC_L(string path)
+	StitchFrame& StitchFrame::setSRC_L(string path)
 	{
 		src_L = imread(path, 1);
 		return *this;
 	}
 
 
-	StitchForVideo& StitchForVideo::setSRC_L(Mat image)
+	StitchFrame& StitchFrame::setSRC_L(Mat image)
 	{
 		src_L = image;
 		return *this;
 	}
 
 
-	StitchForVideo& StitchForVideo::setSRC_R(string path)
+	StitchFrame& StitchFrame::setSRC_R(string path)
 	{
 		src_R = imread(path, 1);
 		return *this;
 	}
 
 
-	StitchForVideo& StitchForVideo::setSRC_R(Mat image)
+	StitchFrame& StitchFrame::setSRC_R(Mat image)
 	{
 		src_R = image;
 		return *this;
 	}
 
 
-	bool StitchForVideo::setH(string path)
+	bool StitchFrame::setH(string path)
 	{
 		FileStorage fs;
 		fs.open(path, FileStorage::READ);
@@ -40,13 +41,13 @@
 	}
 
 
-	Mat StitchForVideo::getH()
+	Mat StitchFrame::getH()
 	{
 		return H;
 	}
 
 
-	Mat StitchForVideo::findH(string path,int flag,bool isRebuild)
+	Mat StitchFrame::findH(string path,int flag,bool isRebuild)
 	{
 		if (setH(path) == true && isRebuild==false) {
 			return H;
@@ -103,7 +104,7 @@
 	}
 
 
-	void StitchForVideo::show(string winName)
+	void StitchFrame::show(string winName)
 	{
 		vector<Point2f> obj_corners(4);
 		obj_corners[0] = Point(0, 0);
@@ -123,7 +124,7 @@
 	}
 
 
-	Mat StitchForVideo::stitch(int width, int flag)
+	Mat StitchFrame::stitch(int width, int flag)
 	{
 		start = clock();
 
@@ -162,7 +163,7 @@
 	}
 
 
-	Mat StitchForVideo::stitch_v(int width, int flag)
+	Mat StitchFrame::stitch_v(int width, int flag)
 	{
 		start = clock();
 
@@ -184,7 +185,56 @@
 		return result;
 	}
 
-	Mat StitchForVideo::getResult()
+	Mat StitchFrame::getResult()
 	{
 		return result;
+	}
+
+	void StitchFrame::makeVideo(string pathL, string pathR)
+	{	
+		//定义相关的VideoCapture对象
+		VideoCapture captureL, captureR;
+		//读取视频文件
+		captureL.open(pathL);
+		captureR.open(pathR);
+		//判断视频流读取是否正确
+		if (!(captureL.isOpened() && captureR.isOpened())) 
+			cout << "Fail to open the video!" << endl;
+		//获取视频相关信息  总帧数
+		unsigned int totalFrameL = captureL.get(CV_CAP_PROP_FRAME_COUNT);
+		unsigned int totalFrameR = captureR.get(CV_CAP_PROP_FRAME_COUNT);
+		cout << "Left Video has " << totalFrameL << " frames." << endl;
+		cout << "Right Video has " << totalFrameR << " frames" << endl;	
+		//获取视频相关信息  帧像素宽/高
+		int frameHeightL, frameHeightR, frameWidthL, frameWidthR;
+		frameHeightL = captureL.get(CV_CAP_PROP_FRAME_HEIGHT);
+		frameHeightR = captureR.get(CV_CAP_PROP_FRAME_HEIGHT);
+		frameWidthL = captureL.get(CV_CAP_PROP_FRAME_WIDTH);
+		frameWidthR = captureR.get(CV_CAP_PROP_FRAME_WIDTH);
+		cout << "frameHeigthL = " << frameHeightL << endl;
+		cout << "frameHeigthR = " << frameHeightR << endl;
+		cout << "frameWidthL = " << frameWidthL << endl;
+		cout << "frameWidthR = " << frameWidthR << endl;
+		//获取视频相关信息  帧率
+		double frameRateL = captureL.get(CV_CAP_PROP_FPS);
+		double frameRateR = captureR.get(CV_CAP_PROP_FPS);
+		cout << "FPS_L = " << frameRateL << endl;
+		cout << "FPS_R = " << frameRateR << endl;
+		//read方法获取显示帧
+		long nCount = 1;
+		Mat frameImage;
+		while (true) {
+			cout << "		Current frame:" << nCount << endl;
+			captureL >> frameImage;
+			//判断文件是否读取完
+			if (!frameImage.empty())
+				imshow("frameImg", frameImage);
+			else
+				break;
+			if (char(waitKey(1)) == 'q')
+				break;
+			nCount++;
+		}
+		captureL.release();
+		captureR.release();
 	}
