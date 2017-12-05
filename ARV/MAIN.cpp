@@ -102,19 +102,6 @@ int main()
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 	//ÉãÏñÍ·Æ´½Ó
 
 	//VideoCapture capture(0);

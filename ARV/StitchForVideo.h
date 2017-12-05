@@ -37,11 +37,11 @@ public:
 	StitchForVideo& setSRC_L(Mat image);					//将某个Mat复制到Mat src_L中
 	StitchForVideo& setSRC_R(string path);					//从某个路径导入图片到Mat src_R中
 	StitchForVideo& setSRC_R(Mat image);					//将某个Mat复制到Mat src_R中
-	bool setH(string path);						//从某个路径导入 单应性矩阵 H
-	Mat getH();									//获取当前对象的H，并返回该Mat
-	Mat findH(string path, int flag,bool isRebuild=true);						//计算src_L和src_R的单应性矩阵 H，并返回H
-	void show(string winName);					//显示两图的匹配点对 和 对应的区域 
-	Mat stitch(int width, int flag = 0);		//水平拼接、融合对象中的两幅图片(src_L & src_R) flag==1时，打印出处理所用的总时间
-	Mat stitch_v(int width, int flag = 0);		//竖直拼接、融合对象中的两幅图片(src_L & src_R) flag==1时，打印出处理所用的总时间
+	bool setH(string path);									//从某个路径导入 单应性矩阵 H
+	Mat getH();												//获取当前对象的H，并返回该Mat
+	Mat findH(string path, int flag,bool isRebuild=true);	//计算src_L和src_R的单应性矩阵 H，并返回H，参数依次为导入H的路径（如果有）、匹配点对的查找方式、是否重建 重新计算 H
+	void show(string winName);								//显示两图的匹配点对 和 对应的区域 
+	Mat stitch(int width, int flag = 0);					//水平拼接、融合对象中的两幅图片(src_L & src_R) flag==1时，打印出处理所用的总时间
+	Mat stitch_v(int width, int flag = 0);					//竖直拼接、融合对象中的两幅图片(src_L & src_R) flag==1时，打印出处理所用的总时间
 	Mat getResult();
 };

@@ -69,7 +69,7 @@
 
 			//匹配
 			matcher.match(c, d, matches);
-			//筛选匹配点
+			//筛选匹配点/特征点
 			sort(matches.begin(), matches.end());
 
 			ptsPairs = min(150, (int)(matches.size() * 0.15));
@@ -78,7 +78,7 @@
 			{
 				good_matches.push_back(matches[i]);
 			}
-			//绘制匹配点
+			//绘制匹配点/特征点
 			drawMatches(gray_R, key1, gray_L, key2, good_matches, outimg,
 				Scalar::all(-1), Scalar::all(-1), vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
 
@@ -90,8 +90,9 @@
 			//寻找匹配的图像
 			H = findHomography(obj, scene, RANSAC);
 			finish = clock();
-			cout << "findH: " << (double)(finish - start) << " ms" << endl;
+			cout << "findH: " << (double)(finish - start) << " ms" << endl;			//输出所使用的时间
 
+			//输出计算出的H到XML文件中
 			FileStorage fs(path, FileStorage::WRITE);
 			fs << "H_MAT_DATA" << H;
 			fs.release();
