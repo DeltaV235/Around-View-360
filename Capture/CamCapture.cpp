@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "CamCapture.h"
 
-#define camMaxNum 6
 
 CamCapture & CamCapture::capture(int camSeq, int width, int heigth, double fps, string savePath)
 {
@@ -45,7 +44,7 @@ CamCapture & CamCapture::capture(int camSeq, int width, int heigth, double fps, 
 }
 
 
-CamCapture & CamCapture::capture(unsigned int  camNum, int width, int heigth, double fps, char saveDirName[])
+CamCapture & CamCapture::capture(int  camNum, int width, int heigth, double fps, char saveDirName[])
 {
 	VideoCapture *cam[camMaxNum];
 	Size videoResolution[camMaxNum];
@@ -90,7 +89,11 @@ CamCapture & CamCapture::capture(unsigned int  camNum, int width, int heigth, do
 		if (char(waitKey(1)) == 'q')
 		{
 			for (int i = 0; i < camNum; i++)
+			{
 				cout << "writeTotalFrame for Cam " << i << " : " << count[i] << endl;
+				cam[i]->release();
+			}
+				
 			break;
 		}
 	}
