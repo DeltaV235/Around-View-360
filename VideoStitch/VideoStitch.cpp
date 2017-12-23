@@ -1,22 +1,30 @@
 #include "stdafx.h"
 #include "VideoStitch.h"
 
-VideoStitch & VideoStitch::readVideo(char dirName[],int videoNum)
+bool VideoStitch::readVideo(string dirName,int videoNum)
 {
-	VideoCapture videoCapture[camMaxNum];
-	StitchFrame stitchFrame[camMaxNum+1];
-	VideoWriter output;
-
+	bool flag = true;
+	fileName = dir.GetListFiles(dirName, "*.avi", true);
 	for (int i = 0; i < videoNum; i++)
 	{
-		videoCapture[i].open(dirName);
+		videoCapture[i].open(fileName[i]);
 		if (!videoCapture[i].isOpened())
 		{
-			cout << "Fail to open video " << i << " !	" << endl;
-			return *this;
+			cout << "Fail to open video " << fileName[i] << " !	" << endl;
+			flag = false;
+		}
+		else
+		{
+			cout << fileName[i] << "has opened." << endl;
+			videoCapture[i]>>src[i];
 		}
 	}
-	while (true)
+	return flag;
+	
+}
+	
+
+	/*while (true)
 	{
 		for (int i = 0; i < videoNum; i++) 
 		{
@@ -37,9 +45,7 @@ VideoStitch & VideoStitch::readVideo(char dirName[],int videoNum)
 		if (char(waitKey(1)) == 'q')
 			break;
 	}
-
-	return *this;
-}
+*/
 
 VideoStitch & VideoStitch::setResult(Mat mat)
 {

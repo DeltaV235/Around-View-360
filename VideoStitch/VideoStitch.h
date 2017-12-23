@@ -4,19 +4,18 @@
 class VideoStitch
 {
 public:
-	VideoStitch();
-	~VideoStitch();
-	VideoStitch & readVideo(char dirName[],int videoNum);
+	
+	bool readVideo(string dirName,int videoNum);
+	VideoStitch & nextFrame();
+	VideoStitch & release(int videoSeq);
 	VideoStitch & stitchVideo(char dirName[]);
 	VideoStitch & setResult(Mat mat);
 private:
-	Mat src[camMaxNum], result[1];
+	Mat src[camMaxNum], result[camMaxNum];
+	VideoCapture videoCapture[camMaxNum];
+	StitchFrame stitchFrame[camMaxNum];
+	VideoWriter outPut;
+	Directory dir;
+	vector<string> fileName;
 };
 
-VideoStitch::VideoStitch()
-{
-}
-
-VideoStitch::~VideoStitch()
-{
-}
