@@ -49,6 +49,14 @@
 
 	Mat StitchFrame::findH(string path,int flag,bool isRebuild)
 	{
+		vector<DMatch> matches, good_matches;
+		vector<Point2f> obj, scene;
+		vector<KeyPoint>key1, key2;
+		BFMatcher matcher;
+		int ptsPairs = 0;
+		Ptr<SURF> surf = SURF::create(800);
+		Ptr<SIFT> sift = SIFT::create(1800);
+
 		if (setH(path) == true && isRebuild==false) {
 			return H;
 		}
@@ -73,7 +81,7 @@
 			//筛选匹配点/特征点
 			sort(matches.begin(), matches.end());
 
-			ptsPairs = min(150, (int)(matches.size() * 0.15));
+			ptsPairs = min(60, (int)(matches.size() * 0.15));
 			cout << ptsPairs << endl;
 			for (int i = 0; i < ptsPairs; i++)
 			{

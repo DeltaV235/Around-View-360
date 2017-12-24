@@ -4,12 +4,11 @@
 class VideoStitch
 {
 public:
-	
-	bool readVideo(string dirName,int videoNum);
-	VideoStitch & nextFrame();
-	VideoStitch & release(int videoSeq);
-	VideoStitch & stitchVideo(char dirName[]);
-	VideoStitch & setResult(Mat mat);
+	bool readVideo(string dirName);		//将多个视频打开、读入第一帧到src[]中
+	bool nextFrame();							//获取视频的下一帧
+	VideoStitch & release();				//释放视频资源
+	VideoStitch & stitchVideo(string savePath);			//拼接视频帧、输出最终的视频
+//	VideoStitch & setResult(Mat mat);
 private:
 	Mat src[camMaxNum], result[camMaxNum];
 	VideoCapture videoCapture[camMaxNum];

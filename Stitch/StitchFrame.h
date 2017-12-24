@@ -17,13 +17,9 @@ class StitchFrame {
 private:
 	clock_t start, finish;
 	Mat src_L, src_R, gray_R, gray_L, c, d, outimg, H, result;
-	Ptr<SURF> surf = SURF::create(800);
-	Ptr<SIFT> sift = SIFT::create(1800);
-	BFMatcher matcher;
-	vector<KeyPoint>key1, key2;
-	vector<DMatch> matches, good_matches;
-	int ptsPairs = 0;
-	vector<Point2f> obj, scene;
+	
+	
+	
 
 public:
 
