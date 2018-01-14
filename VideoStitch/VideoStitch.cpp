@@ -16,9 +16,9 @@ bool VideoStitch::readVideo(string dirName)
 		else
 		{
 			cout << fileName[i] << " has opened." << endl;
-			cout << videoCapture[i].get(CV_CAP_PROP_FRAME_WIDTH)<<" * ";
-			cout << videoCapture[i].get(CV_CAP_PROP_FRAME_HEIGHT)<<"	";
-			cout << videoCapture[i].get(CV_CAP_PROP_FRAME_COUNT) << " frames"<<endl;
+			cout << videoCapture[i].get(CV_CAP_PROP_FRAME_WIDTH) << " * ";
+			cout << videoCapture[i].get(CV_CAP_PROP_FRAME_HEIGHT) << "	";
+			cout << videoCapture[i].get(CV_CAP_PROP_FRAME_COUNT) << " frames" << endl;
 			videoCapture[i] >> src[i];
 		}
 	}
@@ -36,6 +36,7 @@ bool VideoStitch::nextFrame()
 			return true;
 	}
 	// TODO: 在此处插入 return 语句
+	return false;
 }
 
 VideoStitch & VideoStitch::release()
@@ -54,7 +55,7 @@ VideoStitch & VideoStitch::stitchVideo(string savePath)
 	int count = 0;
 	while (true)
 	{
-		for (int i = 0; i < fileName.size()-1; i++)
+		for (int i = 0; i < (int)fileName.size() - 1; i++)
 		{
 			stitchFrame[i].setSRC_L(src[i]);
 			stitchFrame[i].setSRC_R(src[i + 1]);
@@ -66,7 +67,7 @@ VideoStitch & VideoStitch::stitchVideo(string savePath)
 			stitchFrame[i].stitch(20);
 			imshow(savePath, stitchFrame[i].getResult());
 		}
-		for (int i = 0; i < fileName.size() - 1; i++) 
+		for (int i = 0; i < (int)fileName.size() - 1; i++)
 		{
 			if (isOpened)
 			{
@@ -81,12 +82,12 @@ VideoStitch & VideoStitch::stitchVideo(string savePath)
 		}
 		if (char(waitKey(1)) == 'q')
 		{
-			cout << "writeTotalFrame: " << count << endl;
+			cout << "writeTotalFrame(result): " << count << endl;
 			break;
 		}
 		if (!this->nextFrame())
 		{
-			cout << "writeTotalFrame: " << count << endl;
+			cout << "writeTotalFrame(result): " << count << endl;
 			break;
 		}
 	}
