@@ -49,6 +49,7 @@
 
 	Mat StitchFrame::findH(string path,int flag,bool isRebuild)
 	{
+		Mat c, d;
 		vector<DMatch> matches, good_matches;
 		vector<Point2f> obj, scene;
 		vector<KeyPoint>key1, key2;
@@ -68,7 +69,6 @@
 			if (flag == 0) {
 				surf->detectAndCompute(gray_R, Mat(), key1, c);
 				surf->detectAndCompute(gray_L, Mat(), key2, d);
-
 			}
 			else if (flag == 1)
 			{
@@ -127,6 +127,7 @@
 		line(outimg, scene_corners[1] + Point2f((float)gray_R.cols, 0), scene_corners[2] + Point2f((float)gray_R.cols, 0), Scalar(0, 255, 0), 2, LINE_AA);
 		line(outimg, scene_corners[2] + Point2f((float)gray_R.cols, 0), scene_corners[3] + Point2f((float)gray_R.cols, 0), Scalar(0, 255, 0), 2, LINE_AA);
 		line(outimg, scene_corners[3] + Point2f((float)gray_R.cols, 0), scene_corners[0] + Point2f((float)gray_R.cols, 0), Scalar(0, 255, 0), 2, LINE_AA);
+		namedWindow(winName, WINDOW_KEEPRATIO);
 		imshow(winName, outimg);
 
 	}
@@ -246,3 +247,5 @@
 		captureL.release();
 		captureR.release();
 	}
+
+	
