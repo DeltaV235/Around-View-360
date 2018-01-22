@@ -81,13 +81,14 @@ CamCapture & CamCapture::capture(int  camNum, int width, int heigth, double fps,
 		}
 		for (int i = 0; i < camNum; i++)
 		{
-			
+
 			*cam[i] >> frameImg[i];
 			sprintf(fileName, "%s\\Cam%d.avi", saveDirName, i);
+			namedWindow(fileName, WINDOW_KEEPRATIO);
 			imshow(fileName, frameImg[i]);
 			if (!frameImg[i].empty() && isStart)
 			{
-				if (openNum < camNum) 
+				if (openNum < camNum)
 				{
 					sprintf(fileName, "%s\\Cam%d.avi", saveDirName, i);
 					output[i].open(fileName, CV_FOURCC('D', 'I', 'V', 'X'), fps, videoResolution[i], true);
@@ -95,7 +96,7 @@ CamCapture & CamCapture::capture(int  camNum, int width, int heigth, double fps,
 						cout << "Fail to open file " << i << " !" << endl;
 					openNum++;
 				}
-				
+
 				count[i]++;
 				output[i] << frameImg[i];
 			}
@@ -105,40 +106,47 @@ CamCapture & CamCapture::capture(int  camNum, int width, int heigth, double fps,
 				break;
 			}*/
 		}
-		
-			if (char(waitKey(1)) == 'a')
+
+		if (char(waitKey(1)) == 'a')
+		{
+			stitchFrame.setSRC_L(frameImg[0]);
+			stitchFrame.setSRC_R(frameImg[1]);
+			stitchFrame.findH("preViewH.xml", STITCH_SIFT, true);
+			namedWindow("outimg", WINDOW_KEEPRATIO);
+			stitchFrame.show("outimg");
+			namedWindow("preView", WINDOW_KEEPRATIO);
+			imshow("preView", stitchFrame.stitch(20));
+
+
+			Mat result, result2;
+			vector<Mat> imgs;
+			imgs.push_back(frameImg[0]);
+			imgs.push_back(frameImg[1]);
+			stitch(imgs, result);
+			if (!result.empty())
 			{
-				stitchFrame.setSRC_L(frameImg[0]);
-				stitchFrame.setSRC_R(frameImg[1]);
-				stitchFrame.findH("preViewH.xml", STITCH_SIFT, true);
-				stitchFrame.show("outimg");
-				imshow("preView", stitchFrame.stitch(20));
-
-
-				Mat result,result2;
-				vector<Mat> imgs;
-				imgs.push_back(frameImg[0]);
-				imgs.push_back(frameImg[1]);
-				stitch(imgs, result);
-				if (!result.empty())
-				{
-					namedWindow("test stitch", WINDOW_KEEPRATIO);
-					imshow("test stitch", result);
-				}
-				
-
-				stitch2(frameImg[0], frameImg[1], result2);
-				if (!result2.empty())
-				{
-					namedWindow("test stitch2", WINDOW_KEEPRATIO);
-					imshow("test stitch2", result2);
-				}
-				
+				namedWindow("test stitch", WINDOW_KEEPRATIO);
+				imshow("test stitch", result);
 			}
+
+
+			stitch2(frameImg[0], frameImg[1], result2);
+			if (!result2.empty())
+			{
+				namedWindow("test stitch2", WINDOW_KEEPRATIO);
+				imshow("test stitch2", result2);
+			}
+
+		}
 		if (char(waitKey(1)) == 'q')
 		{
 			for (int i = 0; i < camNum; i++)
+			{
 				cam[i]->release();
+				sprintf(fileName, "%s\\Cam%d.avi", saveDirName, i);
+				destroyWindow(fileName);
+			}
+
 			for (int i = 0; i < camNum; i++)
 				cout << "writeTotalFrame for Cam " << i << " : " << count[i] << endl;
 			break;
@@ -189,7 +197,7 @@ void stitch2(Mat& srcImage1, Mat& srcImage2, Mat& panorama)
 	std::vector< DMatch > good_matches;
 	for (int i = 0; i < desMat1.rows; i++)
 	{
-		if (matches[i].distance < 3 * min_dist)
+		if (matches[i].distance < 2 * min_dist)
 		{
 			good_matches.push_back(matches[i]);
 		}
@@ -199,16 +207,14 @@ void stitch2(Mat& srcImage1, Mat& srcImage2, Mat& panorama)
 	std::vector<Point2f> srcImage2_matchedKPs;
 	for (size_t i = 0; i < good_matches.size(); i++)
 	{
-		srcImage1_matchedKPs.push_back(
-			kPointMat[good_matches[i].queryIdx].pt);		srcImage2_matchedKPs.push_back(
-				kPointMat2[good_matches[i].trainIdx].pt);
+		srcImage1_matchedKPs.push_back(kPointMat[good_matches[i].queryIdx].pt);
+		srcImage2_matchedKPs.push_back(kPointMat2[good_matches[i].trainIdx].pt);
 	}
 	// ¼ÆËãÍ¼Ïñ1ÓëÍ¼Ïñ2µÄÓ³Éä
 	Mat H = findHomography(Mat(srcImage2_matchedKPs),
 		Mat(srcImage1_matchedKPs), CV_RANSAC);
 	// ·ÂÉä±ä»»
-	warpPerspective(srcImage2, srcImage2Warped, H,
-		Size(srcImage2.cols * 2, srcImage2.rows), INTER_CUBIC);
+	warpPerspective(srcImage2, srcImage2Warped, H, Size(srcImage2.cols * 2, srcImage2.rows), INTER_CUBIC);
 	panorama = srcImage2Warped.clone();
 	// ½á¹ûÊä³ö
 	Mat roi(panorama, Rect(0, 0,

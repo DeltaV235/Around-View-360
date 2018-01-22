@@ -7,6 +7,7 @@
 
 #define STITCH_SURF 0
 #define STITCH_SIFT 1
+#define STITCH_SURF_FLANN
 #define IS_REBUILD_H false
 
 using namespace cv;

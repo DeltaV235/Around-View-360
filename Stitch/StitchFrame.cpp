@@ -77,19 +77,25 @@
 			}
 
 			//匹配
-			matcher.match(c, d, matches);
-			//筛选匹配点/特征点
-			sort(matches.begin(), matches.end());
-
-			ptsPairs = min(60, (int)(matches.size() * 0.15));
-			cout << ptsPairs << endl;
-			for (int i = 0; i < ptsPairs; i++)
+			if (flag == 0 || flag == 1)
 			{
-				good_matches.push_back(matches[i]);
+				matcher.match(c, d, matches);
+				//筛选匹配点/特征点
+				sort(matches.begin(), matches.end());
+
+				ptsPairs = min(60, (int)(matches.size() * 0.15));
+				cout << ptsPairs << endl;
+				for (int i = 0; i < ptsPairs; i++)
+					good_matches.push_back(matches[i]);
+				//绘制匹配点/特征点
+				drawMatches(gray_R, key1, gray_L, key2, good_matches, outimg,
+					Scalar::all(-1), Scalar::all(-1), vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
 			}
-			//绘制匹配点/特征点
-			drawMatches(gray_R, key1, gray_L, key2, good_matches, outimg,
-				Scalar::all(-1), Scalar::all(-1), vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
+
+			if (flag == 2)
+			{
+
+			}
 
 			for (size_t i = 0; i < good_matches.size(); i++)
 			{

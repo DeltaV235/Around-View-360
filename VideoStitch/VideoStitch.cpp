@@ -4,8 +4,8 @@
 bool VideoStitch::readVideo(string dirName)
 {
 	bool flag = true;
-	fileName = dir.GetListFiles(dirName, "*.avi", true);
-	for (int i = 0; i < fileName.size(); i++)
+	fileName = dir.GetListFiles(dirName, "Cam*.avi", true);
+	for (int i = 0; i < (int)fileName.size(); i++)
 	{
 		videoCapture[i].open(fileName[i]);
 		if (!videoCapture[i].isOpened())
@@ -27,21 +27,21 @@ bool VideoStitch::readVideo(string dirName)
 
 bool VideoStitch::nextFrame()
 {
-	for (int i = 0; i < fileName.size(); i++)
-	{
+	for (int i = 0; i < (int)fileName.size(); i++)
 		videoCapture[i] >> src[i];
+	// TODO: 在此处插入 return 语句
+	for (int i = 0; i < (int)fileName.size(); i++)
+	{
 		if (src[i].empty())
 			return false;
 		else
 			return true;
 	}
-	// TODO: 在此处插入 return 语句
-	return false;
 }
 
 VideoStitch & VideoStitch::release()
 {
-	for (int i = 0; i < fileName.size(); i++)
+	for (int i = 0; i < (int)fileName.size(); i++)
 	{
 		videoCapture[i].release();
 	}
@@ -65,10 +65,9 @@ VideoStitch & VideoStitch::stitchVideo(string savePath)
 				flag = false;
 			}
 			stitchFrame[i].stitch(20);
+			namedWindow(savePath, WINDOW_KEEPRATIO);
 			imshow(savePath, stitchFrame[i].getResult());
-		}
-		for (int i = 0; i < (int)fileName.size() - 1; i++)
-		{
+
 			if (isOpened)
 			{
 				outPut.open(savePath, CV_FOURCC('D', 'I', 'V', 'X'), 24, Size(stitchFrame[i].getResult().cols, stitchFrame[i].getResult().rows), true);
@@ -82,11 +81,62 @@ VideoStitch & VideoStitch::stitchVideo(string savePath)
 		}
 		if (char(waitKey(1)) == 'q')
 		{
+			destroyWindow(savePath);
 			cout << "writeTotalFrame(result): " << count << endl;
 			break;
 		}
 		if (!this->nextFrame())
 		{
+			destroyWindow(savePath);
+			cout << "writeTotalFrame(result): " << count << endl;
+			break;
+		}
+	}
+	this->release();
+	return *this;
+	// TODO: 在此处插入 return 语句
+}
+
+VideoStitch & VideoStitch::stitchVideo2(string savePath)
+{
+	vector<Mat> imgs;
+	Mat result;
+
+
+	bool isOpened = true;
+	int count = 0;
+	while (true)
+	{
+		for (int i = 0; i < (int)fileName.size() - 1; i++)
+		{
+			imgs.push_back(src[i]);
+			imgs.push_back(src[i + 1]);
+			stitch(imgs, result);
+			if (!result.empty())
+			{
+				namedWindow(savePath, WINDOW_KEEPRATIO);
+				imshow(savePath, result);
+			}
+			if (isOpened)
+			{
+				outPut.open(savePath, CV_FOURCC('D', 'I', 'V', 'X'), 24, Size(stitchFrame[i].getResult().cols, stitchFrame[i].getResult().rows), true);
+				if (!outPut.isOpened())
+					cout << "Fail to save the Final Video !" << endl;
+				else
+					isOpened = false;
+			}
+			outPut << result;
+			count++;
+		}
+		if (char(waitKey(1)) == 'q')
+		{
+			destroyWindow(savePath);
+			cout << "writeTotalFrame(result): " << count << endl;
+			break;
+		}
+		if (!this->nextFrame())
+		{
+			destroyWindow(savePath);
 			cout << "writeTotalFrame(result): " << count << endl;
 			break;
 		}
