@@ -53,7 +53,7 @@
 		vector<DMatch> matches, good_matches;
 		vector<Point2f> obj, scene;
 		vector<KeyPoint>key1, key2;
-		BFMatcher matcher;
+		
 		int ptsPairs = 0;
 		Ptr<SURF> surf = SURF::create(800);
 		Ptr<SIFT> sift = SIFT::create(1800);
@@ -66,7 +66,8 @@
 									//将原图转化成灰度图
 			cvtColor(src_R, gray_R, COLOR_BGR2GRAY);
 			cvtColor(src_L, gray_L, COLOR_BGR2GRAY);
-			if (flag == 0) {
+			if (flag == 0 || flag == 2)
+			{
 				surf->detectAndCompute(gray_R, Mat(), key1, c);
 				surf->detectAndCompute(gray_L, Mat(), key2, d);
 			}
@@ -79,6 +80,7 @@
 			//匹配
 			if (flag == 0 || flag == 1)
 			{
+				BFMatcher matcher;
 				matcher.match(c, d, matches);
 				//筛选匹配点/特征点
 				sort(matches.begin(), matches.end());
@@ -94,7 +96,39 @@
 
 			if (flag == 2)
 			{
+				FlannBasedMatcher matcher;
+				matcher.match(c, d, matches);
+				double max_dist = 0; 
+				double min_dist = 100;
 
+				//-- Quick calculation of max and min distances between keypoints  
+				for (int i = 0; i < c.rows; i++)
+				{
+					double dist = matches[i].distance;
+					if (dist < min_dist) 
+						min_dist = dist;
+					if (dist > max_dist) 
+						max_dist = dist;
+				}
+
+				printf("-- Max dist : %f \n", max_dist);
+				printf("-- Min dist : %f \n", min_dist);
+
+				//-- Draw only "good" matches (i.e. whose distance is less than 2*min_dist )  
+				//-- PS.- radiusMatch can also be used here.  
+				
+				for (int i = 0; i < c.rows; i++)
+				{
+					if (matches[i].distance < 2 * min_dist)
+					{
+						good_matches.push_back(matches[i]);
+					}
+				}
+
+				//-- Draw only "good" matches  
+				Mat img_matches;
+				drawMatches(gray_R, key1, gray_L, key2, good_matches, outimg, 
+					Scalar::all(-1), Scalar::all(-1),vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
 			}
 
 			for (size_t i = 0; i < good_matches.size(); i++)

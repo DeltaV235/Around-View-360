@@ -61,7 +61,7 @@ VideoStitch & VideoStitch::stitchVideo(string savePath)
 			stitchFrame[i].setSRC_R(src[i + 1]);
 			if (flag)
 			{
-				stitchFrame[i].findH("H.xml", STITCH_SURF, true);
+				stitchFrame[i].findH("H.xml", STITCH_SURF_FLANN, true);
 				flag = false;
 			}
 			stitchFrame[i].stitch(20);
