@@ -217,7 +217,6 @@ void stitch2(Mat& srcImage1, Mat& srcImage2, Mat& panorama)
 	warpPerspective(srcImage2, srcImage2Warped, H, Size(srcImage2.cols * 2, srcImage2.rows), INTER_CUBIC);
 	panorama = srcImage2Warped.clone();
 	// ½á¹ûÊä³ö
-	Mat roi(panorama, Rect(0, 0,
-		srcImage1.cols, srcImage1.rows));
+	Mat roi(panorama, Rect(0, 0,srcImage1.cols, srcImage1.rows));
 	srcImage1.copyTo(roi);
 }

@@ -109,25 +109,29 @@ VideoStitch & VideoStitch::stitchVideo2(string savePath)
 	{
 		for (int i = 0; i < (int)fileName.size() - 1; i++)
 		{
-			imgs.push_back(src[i]);
+			resize(src[i], src[i], Size(640, 360), 0, 0, CV_INTER_LINEAR);
+			resize(src[i+1], src[i+1], Size(640, 360), 0, 0, CV_INTER_LINEAR);
+			imgs.push_back(src[i]); 
 			imgs.push_back(src[i + 1]);
 			stitch(imgs, result);
+			cout << "output "<<count+1<<" frame" << endl;
 			if (!result.empty())
 			{
 				namedWindow(savePath, WINDOW_KEEPRATIO);
 				imshow(savePath, result);
+				outPut << result;
+				count++;
 			}
 			if (isOpened)
 			{
-				outPut.open(savePath, CV_FOURCC('D', 'I', 'V', 'X'), 24, Size(stitchFrame[i].getResult().cols, stitchFrame[i].getResult().rows), true);
+				outPut.open(savePath, CV_FOURCC('D', 'I', 'V', 'X'), 24, Size(stitchFrame[i].getResult().cols*1.5, stitchFrame[i].getResult().rows*1.5), true);
 				if (!outPut.isOpened())
 					cout << "Fail to save the Final Video !" << endl;
 				else
 					isOpened = false;
 			}
-			outPut << result;
-			count++;
 		}
+		imgs.clear();
 		if (char(waitKey(1)) == 'q')
 		{
 			destroyWindow(savePath);

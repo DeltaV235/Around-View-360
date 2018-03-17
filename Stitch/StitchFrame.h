@@ -21,7 +21,7 @@ private:
 
 public:
 
-	StitchFrame & setSRC_L(string path);					//从某个路径导入图片到Mat src_L中，导入成功则返回true
+	StitchFrame& setSRC_L(string path);						//从某个路径导入图片到Mat src_L中，导入成功则返回true
 	StitchFrame& setSRC_L(Mat image);						//将某个Mat复制到Mat src_L中
 	StitchFrame& setSRC_R(string path);						//从某个路径导入图片到Mat src_R中
 	StitchFrame& setSRC_R(Mat image);						//将某个Mat复制到Mat src_R中

@@ -24,7 +24,7 @@ private:
 public:
 	//CamCapture& videoSave();
 	CamCapture & capture(int camSeq, int width, int heigth, double fps, string savePath);		//单摄像头采集视频 savePath为保存的路径
-	CamCapture & capture(int  camNum, int width, int heigth, double fps, char saveDirName[]);	//多摄像头同时采集视频 saveDirPath为保存的文件夹路径
+	CamCapture & capture(int camNum, int width, int heigth, double fps, char saveDirName[]);	//多摄像头同时采集视频 saveDirPath为保存的文件夹路径
 };
 
 void stitch(vector<Mat> imgs, Mat& resultMat);
