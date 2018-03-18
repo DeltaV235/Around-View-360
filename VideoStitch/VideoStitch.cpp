@@ -60,59 +60,81 @@ VideoStitch & VideoStitch::stitchVideo(string savePath)								//拼接单帧画面 并
 		namedWindow(savePath, WINDOW_FULLSCREEN);
 		switch ((int)fileName.size() - 1)
 		{
-			case 1:
+		case 1:
+		{
+			stitchFrame[0].setSRC_L(src[0]);
+			stitchFrame[0].setSRC_R(src[1]);
+			if (flag)
 			{
-				stitchFrame[0].setSRC_L(src[0]);
-				stitchFrame[0].setSRC_R(src[1]);
-				if (flag)
-				{
-					stitchFrame[0].findH("H.xml", STITCH_SIFT, true);
-					flag = false;
-				}
-				stitchFrame[0].stitch(50);
-				imshow(savePath, stitchFrame[0].getResult());
-
-				break;
+				stitchFrame[0].findH(savePath + "H.xml", STITCH_SIFT, true);
+				flag = false;
 			}
-			case 3:
+			stitchFrame[0].stitch(50);
+			imshow(savePath, stitchFrame[0].getResult());
+
+			break;
+		}
+		case 3:
+		{
+			stitchFrame[0].setSRC_L(src[0]);
+			stitchFrame[0].setSRC_R(src[1]);
+			stitchFrame[1].setSRC_L(src[2]);
+			stitchFrame[1].setSRC_R(src[3]);
+			if (flag)
 			{
-				stitchFrame[0].setSRC_L(src[0]);
-				stitchFrame[0].setSRC_R(src[1]);
-				stitchFrame[1].setSRC_L(src[2]);
-				stitchFrame[1].setSRC_R(src[3]);
-				if (flag)
-				{
-					stitchFrame[0].findH("H_U.xml", STITCH_SIFT, false);
-					stitchFrame[1].findH("H_D.xml", STITCH_SIFT, false);
-					stitchFrame[0].show("up");
-					stitchFrame[1].show("down");
-				}
-				
-				stitchFrame[2].setSRC_L(stitchFrame[0].stitch(50));
-				stitchFrame[2].setSRC_R(stitchFrame[1].stitch(50));
-				if (flag)
-				{
-					stitchFrame[2].findH("H_Whole.xml", STITCH_SIFT, false);
-					stitchFrame[2].show("whole");
-					flag = false;
-				}
-				stitchFrame[2].stitch_v(50);
-				imshow(savePath, stitchFrame[2].getResult());
-
-				break;
+				stitchFrame[0].findH(savePath + "H_U.xml", STITCH_SIFT, false);
+				stitchFrame[1].findH(savePath + "H_D.xml", STITCH_SIFT, false);
+				//stitchFrame[0].show("up");
+				//stitchFrame[1].show("down");
 			}
-			case 6:
+
+			stitchFrame[2].setSRC_L(stitchFrame[0].stitch(50));
+			stitchFrame[2].setSRC_R(stitchFrame[1].stitch(50));
+			if (flag)
 			{
-
-
-				break;
+				stitchFrame[2].findH(savePath + "H_Whole.xml", STITCH_SIFT, false);
+				stitchFrame[2].show("whole");
+				flag = false;
 			}
-			default:
+			stitchFrame[2].stitch_v(50);
+			imshow(savePath, stitchFrame[2].getResult());
+
+			break;
+		}
+		case 6:
+		{
+			stitchFrame[0].setSRC_L(src[0]).setSRC_R(src[1]);
+			stitchFrame[1].setSRC_L(src[1]).setSRC_R(src[2]);
+			stitchFrame[2].setSRC_L(src[3]).setSRC_R(src[4]);
+			stitchFrame[3].setSRC_L(src[4]).setSRC_R(src[5]);
+			if (flag)
 			{
-				cout << "arg error" << endl;
-				break;
+				stitchFrame[0].findH(savePath + "H_1LC.xml", STITCH_SIFT, false);
+				stitchFrame[1].findH(savePath + "H_1CR.xml", STITCH_SIFT, false);
+				stitchFrame[2].findH(savePath + "H_2LC.xml", STITCH_SIFT, false);
+				stitchFrame[3].findH(savePath + "H_2CR.xml", STITCH_SIFT, false);
+				//stitchFrame[0].show("up");
+				//stitchFrame[1].show("down");
 			}
-		}	
+			
+			if (flag)
+			{
+				stitchFrame[4].setSRC_L(stitchFrame[0].setSRC_R(stitchFrame[1].stitch(50)).stitch(50)).setSRC_R(stitchFrame[2]
+					.setSRC_R(stitchFrame[3].stitch(50)).stitch(50)).findH(savePath + "H_UD.xml", STITCH_SIFT, false);
+				//stitchFrame[2].show("whole");
+				flag = false;
+			}
+			stitchFrame[4].stitch_v(50);
+			imshow(savePath, stitchFrame[4].getResult());
+
+			break;
+		}
+		default:
+		{
+			cout << "arg error" << endl;
+			break;
+		}
+		}
 		if (isOpened)														//创建视频文件
 		{
 			outPut.open(savePath, CV_FOURCC('D', 'I', 'V', 'X'), 24, Size(stitchFrame[(int)fileName.size() - 2].getResult().cols, stitchFrame[(int)fileName.size() - 2].getResult().rows), true);
@@ -156,10 +178,10 @@ VideoStitch & VideoStitch::stitchVideo2(string savePath)						//读取视频，拼接单
 		{
 			/*resize(src[i], src[i], Size(640, 360), 0, 0, CV_INTER_LINEAR);
 			resize(src[i+1], src[i+1], Size(640, 360), 0, 0, CV_INTER_LINEAR);*/
-			imgs.push_back(src[i]); 
+			imgs.push_back(src[i]);
 			imgs.push_back(src[i + 1]);
 			stitch(imgs, result);
-			cout << "output "<<count+1<<" frame" << endl;
+			cout << "output " << count + 1 << " frame" << endl;
 			//sprintf(picName, "\\%04d.jpg", count+1);
 			//imwrite(savePath+picName, result);
 
