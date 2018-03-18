@@ -56,18 +56,18 @@ CamCapture & CamCapture::capture(int  camNum, int width, int heigth, double fps,
 	int count[camMaxNum] = { 0 }, openNum = 0;
 	bool isStart = false;
 	Mat frameImg[camMaxNum];
-	for (int i = 0; i < camNum; i++)
+	for (int i = 0; i < camNum; i++)					//设置摄像头参数，并打开摄像头
 	{
 		cam[i] = new VideoCapture(i);
 		cam[i]->set(CV_CAP_PROP_FRAME_WIDTH, width);
 		cam[i]->set(CV_CAP_PROP_FRAME_HEIGHT, heigth);
 		cam[i]->set(CV_CAP_PROP_FPS, fps);
 
-		//cam[i]->set(CV_CAP_PROP_BRIGHTNESS, 128);//亮度 1
-		//cam[i]->set(CV_CAP_PROP_CONTRAST, 50);//对比度 40
-		//cam[i]->set(CV_CAP_PROP_SATURATION, 50);//饱和度 50
-		//cam[i]->set(CV_CAP_PROP_HUE, 50);//色调 50
-		//cam[i]->set(CV_CAP_PROP_EXPOSURE, -2);//曝光 50
+		//cam[i]->set(CV_CAP_PROP_BRIGHTNESS, 128);			//亮度 1
+		//cam[i]->set(CV_CAP_PROP_CONTRAST, 50);			//对比度 40
+		//cam[i]->set(CV_CAP_PROP_SATURATION, 50);			//饱和度 50
+		//cam[i]->set(CV_CAP_PROP_HUE, 50);					//色调 50
+		//cam[i]->set(CV_CAP_PROP_EXPOSURE, -2);			//曝光 50
 		//cam[i]->set(CV_CAP_PROP_FOCUS, 50);
 
 		videoResolution[i] = Size((int)cam[i]->get(CV_CAP_PROP_FRAME_WIDTH), (int)cam[i]->get(CV_CAP_PROP_FRAME_HEIGHT));		//获取视频分辨率
@@ -82,19 +82,18 @@ CamCapture & CamCapture::capture(int  camNum, int width, int heigth, double fps,
 
 	while (true)
 	{
-		if (char(waitKey(1)) == ' ')
+		if (char(waitKey(1)) == ' ')				//输入<sp> 开始录像
 		{
 			isStart = true;
 			cout << "Start Record !" << endl;
 		}
-		for (int i = 0; i < camNum; i++)
+		for (int i = 0; i < camNum; i++)					//显示实时采集到的画面
 		{
-
 			*cam[i] >> frameImg[i];
 			sprintf(fileName, "%s\\Cam%d.avi", saveDirName, i);
 			namedWindow(fileName, WINDOW_KEEPRATIO);
 			imshow(fileName, frameImg[i]);
-			if (!frameImg[i].empty() && isStart)
+			if (!frameImg[i].empty() && isStart)			//如果已经采集到画面 并且 开始录像，则开始将画面保存到指定的目录下
 			{
 				if (openNum < camNum)
 				{
@@ -104,7 +103,6 @@ CamCapture & CamCapture::capture(int  camNum, int width, int heigth, double fps,
 						cout << "Fail to open file " << i << " !" << endl;
 					openNum++;
 				}
-
 				count[i]++;
 				output[i] << frameImg[i];
 			}
@@ -114,7 +112,7 @@ CamCapture & CamCapture::capture(int  camNum, int width, int heigth, double fps,
 				break;
 			}*/
 		}
-		if (count[0] == 150)
+		if (count[0] == 150)							//当保存了X帧后，停止录像，并返回
 		{
 			for (int i = 0; i < camNum; i++)
 			{
@@ -125,7 +123,7 @@ CamCapture & CamCapture::capture(int  camNum, int width, int heigth, double fps,
 			break;
 		}
 
-		if (char(waitKey(1)) == 'a')
+		if (char(waitKey(1)) == 'a')						//如果按下 a ，则找到其中的两幅图像的映射矩阵，拼接，并显示拼接后图像，映射矩阵保存为 preViewH.xml
 		{
 			stitchFrame.setSRC_L(frameImg[0]);
 			stitchFrame.setSRC_R(frameImg[1]);
@@ -156,7 +154,7 @@ CamCapture & CamCapture::capture(int  camNum, int width, int heigth, double fps,
 			}*/
 
 		}
-		if (char(waitKey(1)) == 'q')
+		if (char(waitKey(1)) == 'q')					//按下 q ,退出录像，释放所有网络摄像头，关闭所有摄像头的窗口
 		{
 			for (int i = 0; i < camNum; i++)
 			{
@@ -165,7 +163,7 @@ CamCapture & CamCapture::capture(int  camNum, int width, int heigth, double fps,
 				destroyWindow(fileName);
 			}
 
-			for (int i = 0; i < camNum; i++)
+			for (int i = 0; i < camNum; i++)			//输出一共写入硬盘的帧数
 				cout << "writeTotalFrame for Cam " << i << " : " << count[i] << endl;
 			break;
 		}
@@ -178,13 +176,13 @@ void stitch(vector<Mat> imgs, Mat& resultMat)
 {
 	bool Flag = true;
 	// 定义Stitcher类
-	Stitcher stitcher = Stitcher::createDefault(Flag);
+	Stitcher stitcher = Stitcher::createDefault(Flag);					//OpenCV自带的Stitch方法
 	Stitcher::Status status = stitcher.stitch(imgs, resultMat);
 	if (status != Stitcher::OK) {
 		std::cout << "error" << std::endl;
 	}
 }
-void stitch2(Mat& srcImage1, Mat& srcImage2, Mat& panorama)
+void stitch2(Mat& srcImage1, Mat& srcImage2, Mat& panorama)				//另一种相似的拼接方法
 {
 	// SURF特征点描述
 	Mat srcImage2Warped;

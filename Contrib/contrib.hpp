@@ -6,7 +6,7 @@
 #include "opencv2/features2d/features2d.hpp"  
 #include "opencv2/objdetect/objdetect.hpp"  
 
-class CV_EXPORTS Directory
+class CV_EXPORTS Directory							//遍历指定文件夹下的指定文件名
 {
 public:
 	static std::vector<std::string> GetListFiles(const std::string& path, const std::string & exten = "*", bool addPath = true);

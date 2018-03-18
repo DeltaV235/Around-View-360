@@ -16,7 +16,7 @@
 
 #define camMaxNum 6
 
-class CamCapture
+class CamCapture							//采集多路视频
 {
 
 private:
@@ -27,5 +27,5 @@ public:
 	CamCapture & capture(int camNum, int width, int heigth, double fps, char saveDirName[]);	//多摄像头同时采集视频 saveDirPath为保存的文件夹路径
 };
 
-void stitch(vector<Mat> imgs, Mat& resultMat);
-void stitch2(Mat& srcImage1, Mat& srcImage2, Mat& panorama);
+void stitch(vector<Mat> imgs, Mat& resultMat);						//OpenCV自带的Stitch方法
+void stitch2(Mat& srcImage1, Mat& srcImage2, Mat& panorama);		//另一种相似的拼接方法

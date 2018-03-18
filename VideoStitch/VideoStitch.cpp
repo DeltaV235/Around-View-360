@@ -4,42 +4,42 @@
 bool VideoStitch::readVideo(string dirName)
 {
 	bool flag = true;
-	fileName = dir.GetListFiles(dirName, "Cam*.avi", true);
-	for (int i = 0; i < (int)fileName.size(); i++)
+	fileName = dir.GetListFiles(dirName, "Cam*.avi", true);							//遍历 dirName 文件夹下的 文件名 为 Cam*.avi 的文件，将其文件名 push进  vector<String> fileName中 
+	for (int i = 0; i < (int)fileName.size(); i++)									//录了几路视频，呢么 fileName.size() 就是多少 ，那么就打开 几个 对应的文件
 	{
-		videoCapture[i].open(fileName[i]);
+		videoCapture[i].open(fileName[i]);											//循环打开视频
 		if (!videoCapture[i].isOpened())
 		{
-			cout << "Fail to open video " << fileName[i] << " !	" << endl;
+			cout << "Fail to open video " << fileName[i] << " !	" << endl;			//如果打开失败则输出错误信息，并返回 false
 			flag = false;
 		}
 		else
 		{
-			cout << fileName[i] << " has opened." << endl;
+			cout << fileName[i] << " has opened." << endl;							//依次获取各路视频的 分辨率 和 帧率
 			cout << videoCapture[i].get(CV_CAP_PROP_FRAME_WIDTH) << " * ";
 			cout << videoCapture[i].get(CV_CAP_PROP_FRAME_HEIGHT) << "	";
 			cout << videoCapture[i].get(CV_CAP_PROP_FRAME_COUNT) << " frames" << endl;
-			videoCapture[i] >> src[i];
+			videoCapture[i] >> src[i];												//将视频中的第一帧输出到成员变量 src[i] 中
 		}
 	}
-	return flag;
+	return flag;																	//返回 true
 }
 
-bool VideoStitch::nextFrame()
+bool VideoStitch::nextFrame()														//读取下一帧视频
 {
 	for (int i = 0; i < (int)fileName.size(); i++)
 		videoCapture[i] >> src[i];
 	// TODO: 在此处插入 return 语句
 	for (int i = 0; i < (int)fileName.size(); i++)
 	{
-		if (src[i].empty())
+		if (src[i].empty())															//如果下一帧为空，即视频已经结束，则返回 false
 			return false;
 		else
 			return true;
 	}
 }
 
-VideoStitch & VideoStitch::release()
+VideoStitch & VideoStitch::release()												//释放所有视频
 {
 	for (int i = 0; i < (int)fileName.size(); i++)
 	{
@@ -49,7 +49,7 @@ VideoStitch & VideoStitch::release()
 	// TODO: 在此处插入 return 语句
 }
 
-VideoStitch & VideoStitch::stitchVideo(string savePath)
+VideoStitch & VideoStitch::stitchVideo(string savePath)								//拼接单帧画面 并 输出到视频容器中，形成一段完整的视频 调用 Stitch 项目 中的StitchFrame类
 {
 	bool flag = true, isOpened = true;
 	int count = 0;
@@ -71,6 +71,8 @@ VideoStitch & VideoStitch::stitchVideo(string savePath)
 				}
 				stitchFrame[0].stitch(50);
 				imshow(savePath, stitchFrame[0].getResult());
+
+				break;
 			}
 			case 3:
 			{
@@ -96,11 +98,22 @@ VideoStitch & VideoStitch::stitchVideo(string savePath)
 				}
 				stitchFrame[2].stitch_v(50);
 				imshow(savePath, stitchFrame[2].getResult());
+
+				break;
+			}
+			case 6:
+			{
+
+
+				break;
 			}
 			default:
+			{
+				cout << "arg error" << endl;
 				break;
+			}
 		}	
-		if (isOpened)
+		if (isOpened)														//创建视频文件
 		{
 			outPut.open(savePath, CV_FOURCC('D', 'I', 'V', 'X'), 24, Size(stitchFrame[(int)fileName.size() - 2].getResult().cols, stitchFrame[(int)fileName.size() - 2].getResult().rows), true);
 			if (!outPut.isOpened())
@@ -108,7 +121,7 @@ VideoStitch & VideoStitch::stitchVideo(string savePath)
 			else
 				isOpened = false;
 		}
-		outPut << stitchFrame[(int)fileName.size() - 2].getResult();
+		outPut << stitchFrame[(int)fileName.size() - 2].getResult();			//写入处理完的图片
 		count++;
 		//}
 		if (char(waitKey(1)) == 'q')
@@ -129,7 +142,7 @@ VideoStitch & VideoStitch::stitchVideo(string savePath)
 	// TODO: 在此处插入 return 语句
 }
 
-VideoStitch & VideoStitch::stitchVideo2(string savePath)
+VideoStitch & VideoStitch::stitchVideo2(string savePath)						//读取视频，拼接单帧图片，基于Stitcher类的拼接方法，无法输出成视频
 {
 	vector<Mat> imgs;
 	Mat result;
@@ -148,7 +161,6 @@ VideoStitch & VideoStitch::stitchVideo2(string savePath)
 			stitch(imgs, result);
 			cout << "output "<<count+1<<" frame" << endl;
 			//sprintf(picName, "\\%04d.jpg", count+1);
-
 			//imwrite(savePath+picName, result);
 
 			if (!result.empty())
