@@ -49,7 +49,7 @@ VideoStitch & VideoStitch::release()												//释放所有视频
 	// TODO: 在此处插入 return 语句
 }
 
-VideoStitch & VideoStitch::stitchVideo(string savePath)								//拼接单帧画面 并 输出到视频容器中，形成一段完整的视频 调用 Stitch 项目 中的StitchFrame类
+bool VideoStitch::stitchVideo(string savePath)								//拼接单帧画面 并 输出到视频容器中，形成一段完整的视频 调用 Stitch 项目 中的StitchFrame类
 {
 	bool flag = true, isOpened = true;
 	int count = 0;
@@ -82,8 +82,8 @@ VideoStitch & VideoStitch::stitchVideo(string savePath)								//拼接单帧画面 并
 			stitchFrame[1].setSRC_R(src[3]);
 			if (flag)
 			{
-				stitchFrame[0].findH(savePath + "H_U.xml", STITCH_SIFT, false);
-				stitchFrame[1].findH(savePath + "H_D.xml", STITCH_SIFT, false);
+				stitchFrame[0].findH( "H_U.xml", STITCH_SIFT, false);
+				stitchFrame[1].findH( "H_D.xml", STITCH_SIFT, false);
 				//stitchFrame[0].show("up");
 				//stitchFrame[1].show("down");
 			}
@@ -92,7 +92,7 @@ VideoStitch & VideoStitch::stitchVideo(string savePath)								//拼接单帧画面 并
 			stitchFrame[2].setSRC_R(stitchFrame[1].stitch(50));
 			if (flag)
 			{
-				stitchFrame[2].findH(savePath + "H_Whole.xml", STITCH_SIFT, false);
+				stitchFrame[2].findH( "H_Whole.xml", STITCH_SIFT, false);
 				stitchFrame[2].show("whole");
 				flag = false;
 			}
@@ -132,7 +132,7 @@ VideoStitch & VideoStitch::stitchVideo(string savePath)								//拼接单帧画面 并
 		default:
 		{
 			cout << "arg error" << endl;
-			break;
+			return false;
 		}
 		}
 		if (isOpened)														//创建视频文件
@@ -160,7 +160,7 @@ VideoStitch & VideoStitch::stitchVideo(string savePath)								//拼接单帧画面 并
 		}
 	}
 	this->release();
-	return *this;
+	return true;
 	// TODO: 在此处插入 return 语句
 }
 
