@@ -55,8 +55,8 @@
 		vector<KeyPoint>key1, key2;
 		
 		int ptsPairs = 0;
-		Ptr<SURF> surf = SURF::create(800);
-		Ptr<SIFT> sift = SIFT::create(1800);
+		Ptr<SURF> surf = SURF::create(1000);
+		Ptr<SIFT> sift = SIFT::create(800);
 
 		if (setH(path) == true && isRebuild==false) {
 			return H;
@@ -85,11 +85,41 @@
 				//筛选匹配点/特征点
 				sort(matches.begin(), matches.end());
 
-				ptsPairs = min(60, (int)(matches.size() * 0.15));
+				ptsPairs = min(2500, (int)(matches.size()*0.5 ));
 				cout << ptsPairs << endl;
 				for (int i = 0; i < ptsPairs; i++)
 					good_matches.push_back(matches[i]);
 				//绘制匹配点/特征点
+
+				//FlannBasedMatcher matcher;
+				//matcher.match(c, d, matches);
+				//double max_dist = 0;
+				//double min_dist = 100;
+
+				////-- Quick calculation of max and min distances between keypoints  
+				//for (int i = 0; i < c.rows; i++)
+				//{
+				//	double dist = matches[i].distance;
+				//	if (dist < min_dist)
+				//		min_dist = dist;
+				//	if (dist > max_dist)
+				//		max_dist = dist;
+				//}
+
+				//printf("-- Max dist : %f \n", max_dist);
+				//printf("-- Min dist : %f \n", min_dist);
+
+				////-- Draw only "good" matches (i.e. whose distance is less than 2*min_dist )  
+				////-- PS.- radiusMatch can also be used here.  
+
+				//for (int i = 0; i < c.rows; i++)
+				//{
+				//	if (matches[i].distance < 2 * min_dist)
+				//	{
+				//		good_matches.push_back(matches[i]);
+				//	}
+				//}
+
 				drawMatches(gray_R, key1, gray_L, key2, good_matches, outimg,
 					Scalar::all(-1), Scalar::all(-1), vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
 			}
@@ -119,7 +149,7 @@
 				
 				for (int i = 0; i < c.rows; i++)
 				{
-					if (matches[i].distance < 2 * min_dist)
+					if (matches[i].distance < 1.8 * min_dist)
 					{
 						good_matches.push_back(matches[i]);
 					}
@@ -160,9 +190,12 @@
 		obj_corners[2] = Point(gray_R.cols, gray_R.rows);
 		obj_corners[3] = Point(0, gray_R.rows);
 		vector<Point2f> scene_corners(4);
-
-		perspectiveTransform(obj_corners, scene_corners, H);
-
+		if (H.rows != 0 && H.cols != 0)
+			perspectiveTransform(obj_corners, scene_corners, H);
+		else
+		{
+			outimg = Mat();
+		}
 		line(outimg, scene_corners[0] + Point2f((float)gray_R.cols, 0), scene_corners[1] + Point2f((float)gray_R.cols, 0), Scalar(0, 255, 0), 2, LINE_AA);       //绘制
 		line(outimg, scene_corners[1] + Point2f((float)gray_R.cols, 0), scene_corners[2] + Point2f((float)gray_R.cols, 0), Scalar(0, 255, 0), 2, LINE_AA);
 		line(outimg, scene_corners[2] + Point2f((float)gray_R.cols, 0), scene_corners[3] + Point2f((float)gray_R.cols, 0), Scalar(0, 255, 0), 2, LINE_AA);
@@ -190,7 +223,12 @@
 		width的愿意为：当系数为2时，两图中重叠的像素的列数，也可以指两图中需要融合的长度（列数）
 		
 		*/
-		warpPerspective(src_R, result, H, Size(1.5 * src_R.cols - width, src_R.rows));
+		if(H.rows!=0 && H.cols!=0)
+			warpPerspective(src_R, result, H, Size(1.5 * src_R.cols - width, src_R.rows));
+		else
+		{
+			return Mat();
+		}
 		//half与result指向同一片内存，大小为src_L去掉重叠区域列数后的长度 * src_L的宽度
 		
 		Mat half(result, Rect(0, 0, src_L.cols - width, src_L.rows));
@@ -218,8 +256,12 @@
 
 		//cols　列 rows 行
 		//Size设置结果图像宽度，宽度裁去一部分，width可调，方法如上 函数stitch(...);
-		warpPerspective(src_R, result, H, Size(src_R.cols, 1.5*src_R.rows - width));
-		
+		if (H.rows != 0 && H.cols != 0)
+			warpPerspective(src_R, result, H, Size(src_R.cols, 1.5*src_R.rows - width));
+		else
+		{
+			return Mat();
+		}
 		Mat half(result, Rect(0, 0, src_L.cols, src_L.rows - width));
 		src_L(Range(0, src_L.rows - width), Range::all()).copyTo(half);
 		for (int i = 0; i < width; i++)
@@ -287,5 +329,3 @@
 		captureL.release();
 		captureR.release();
 	}
-
-	

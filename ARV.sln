@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VideoStitch", "VideoStitch\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Contrib", "Contrib\Contrib.vcxproj", "{9AE69DD6-1D70-41CD-828B-340048CF8DC6}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test\test.vcxproj", "{11DA23C9-531F-4EEA-8FE0-CD1B2D6D5009}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -51,6 +53,14 @@ Global
 		{9AE69DD6-1D70-41CD-828B-340048CF8DC6}.Release|x64.Build.0 = Release|x64
 		{9AE69DD6-1D70-41CD-828B-340048CF8DC6}.Release|x86.ActiveCfg = Release|Win32
 		{9AE69DD6-1D70-41CD-828B-340048CF8DC6}.Release|x86.Build.0 = Release|Win32
+		{11DA23C9-531F-4EEA-8FE0-CD1B2D6D5009}.Debug|x64.ActiveCfg = Debug|x64
+		{11DA23C9-531F-4EEA-8FE0-CD1B2D6D5009}.Debug|x64.Build.0 = Debug|x64
+		{11DA23C9-531F-4EEA-8FE0-CD1B2D6D5009}.Debug|x86.ActiveCfg = Debug|Win32
+		{11DA23C9-531F-4EEA-8FE0-CD1B2D6D5009}.Debug|x86.Build.0 = Debug|Win32
+		{11DA23C9-531F-4EEA-8FE0-CD1B2D6D5009}.Release|x64.ActiveCfg = Release|x64
+		{11DA23C9-531F-4EEA-8FE0-CD1B2D6D5009}.Release|x64.Build.0 = Release|x64
+		{11DA23C9-531F-4EEA-8FE0-CD1B2D6D5009}.Release|x86.ActiveCfg = Release|Win32
+		{11DA23C9-531F-4EEA-8FE0-CD1B2D6D5009}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -62,6 +62,14 @@ CamCapture & CamCapture::capture(int  camNum, int width, int heigth, double fps,
 		cam[i]->set(CV_CAP_PROP_FRAME_WIDTH, width);
 		cam[i]->set(CV_CAP_PROP_FRAME_HEIGHT, heigth);
 		cam[i]->set(CV_CAP_PROP_FPS, fps);
+
+		//cam[i]->set(CV_CAP_PROP_BRIGHTNESS, 128);//亮度 1
+		//cam[i]->set(CV_CAP_PROP_CONTRAST, 50);//对比度 40
+		//cam[i]->set(CV_CAP_PROP_SATURATION, 50);//饱和度 50
+		//cam[i]->set(CV_CAP_PROP_HUE, 50);//色调 50
+		//cam[i]->set(CV_CAP_PROP_EXPOSURE, -2);//曝光 50
+		//cam[i]->set(CV_CAP_PROP_FOCUS, 50);
+
 		videoResolution[i] = Size((int)cam[i]->get(CV_CAP_PROP_FRAME_WIDTH), (int)cam[i]->get(CV_CAP_PROP_FRAME_HEIGHT));		//获取视频分辨率
 		if (!cam[i]->isOpened())
 		{
@@ -106,6 +114,16 @@ CamCapture & CamCapture::capture(int  camNum, int width, int heigth, double fps,
 				break;
 			}*/
 		}
+		if (count[0] == 150)
+		{
+			for (int i = 0; i < camNum; i++)
+			{
+				cam[i]->release();
+				sprintf(fileName, "%s\\Cam%d.avi", saveDirName, i);
+				destroyWindow(fileName);
+			}
+			break;
+		}
 
 		if (char(waitKey(1)) == 'a')
 		{
@@ -118,7 +136,7 @@ CamCapture & CamCapture::capture(int  camNum, int width, int heigth, double fps,
 			imshow("preView", stitchFrame.stitch(20));
 
 
-			Mat result, result2;
+			/*Mat result, result2;
 			vector<Mat> imgs;
 			imgs.push_back(frameImg[0]);
 			imgs.push_back(frameImg[1]);
@@ -135,7 +153,7 @@ CamCapture & CamCapture::capture(int  camNum, int width, int heigth, double fps,
 			{
 				namedWindow("test stitch2", WINDOW_KEEPRATIO);
 				imshow("test stitch2", result2);
-			}
+			}*/
 
 		}
 		if (char(waitKey(1)) == 'q')
