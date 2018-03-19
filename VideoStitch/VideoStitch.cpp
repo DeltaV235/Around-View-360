@@ -66,7 +66,7 @@ bool VideoStitch::stitchVideo(string savePath)								//拼接单帧画面 并 输出到视
 			stitchFrame[0].setSRC_R(src[1]);
 			if (flag)
 			{
-				stitchFrame[0].findH(savePath + "H.xml", STITCH_SIFT, true);
+				stitchFrame[0].findH("Homography\\H.xml", STITCH_SIFT, true);
 				flag = false;
 			}
 			stitchFrame[0].stitch(50);
@@ -82,8 +82,8 @@ bool VideoStitch::stitchVideo(string savePath)								//拼接单帧画面 并 输出到视
 			stitchFrame[1].setSRC_R(src[3]);
 			if (flag)
 			{
-				stitchFrame[0].findH( "H_U.xml", STITCH_SIFT, false);
-				stitchFrame[1].findH( "H_D.xml", STITCH_SIFT, false);
+				stitchFrame[0].findH("Homography\\H_U.xml", STITCH_SIFT, false);
+				stitchFrame[1].findH("Homography\\H_D.xml", STITCH_SIFT, false);
 				//stitchFrame[0].show("up");
 				//stitchFrame[1].show("down");
 			}
@@ -92,7 +92,7 @@ bool VideoStitch::stitchVideo(string savePath)								//拼接单帧画面 并 输出到视
 			stitchFrame[2].setSRC_R(stitchFrame[1].stitch(50));
 			if (flag)
 			{
-				stitchFrame[2].findH( "H_Whole.xml", STITCH_SIFT, false);
+				stitchFrame[2].findH("Homography\\H_UD.xml", STITCH_SIFT, false);
 				stitchFrame[2].show("whole");
 				flag = false;
 			}
@@ -109,10 +109,10 @@ bool VideoStitch::stitchVideo(string savePath)								//拼接单帧画面 并 输出到视
 			stitchFrame[3].setSRC_L(src[4]).setSRC_R(src[5]);
 			if (flag)
 			{
-				stitchFrame[0].findH(savePath + "H_1LC.xml", STITCH_SIFT, false);
-				stitchFrame[1].findH(savePath + "H_1CR.xml", STITCH_SIFT, false);
-				stitchFrame[2].findH(savePath + "H_2LC.xml", STITCH_SIFT, false);
-				stitchFrame[3].findH(savePath + "H_2CR.xml", STITCH_SIFT, false);
+				stitchFrame[0].findH("Homography\\H_1LC.xml", STITCH_SIFT, false);
+				stitchFrame[1].findH("Homography\\H_1CR.xml", STITCH_SIFT, false);
+				stitchFrame[2].findH("Homography\\H_2LC.xml", STITCH_SIFT, false);
+				stitchFrame[3].findH("Homography\\H_2CR.xml", STITCH_SIFT, false);
 				//stitchFrame[0].show("up");
 				//stitchFrame[1].show("down");
 			}
@@ -120,7 +120,7 @@ bool VideoStitch::stitchVideo(string savePath)								//拼接单帧画面 并 输出到视
 			if (flag)
 			{
 				stitchFrame[4].setSRC_L(stitchFrame[0].setSRC_R(stitchFrame[1].stitch(50)).stitch(50)).setSRC_R(stitchFrame[2]
-					.setSRC_R(stitchFrame[3].stitch(50)).stitch(50)).findH(savePath + "H_UD.xml", STITCH_SIFT, false);
+					.setSRC_R(stitchFrame[3].stitch(50)).stitch(50)).findH("Homography\\H_WHOLE.xml", STITCH_SIFT, false);
 				//stitchFrame[2].show("whole");
 				flag = false;
 			}
