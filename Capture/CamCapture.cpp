@@ -55,7 +55,8 @@ bool CamCapture::capture(int  camNum, int width, int heigth, double fps, char sa
 	char fileName[80];
 	int count[camMaxNum] = { 0 }, openNum = 0;
 	bool isStart = false;
-	Mat frameImg[camMaxNum];
+	Mat frameImg[camMaxNum],showImg;
+	vector<Mat> imgs;
 	for (int i = 0; i < camNum; i++)					//设置摄像头参数，并打开摄像头
 	{
 		
@@ -96,9 +97,20 @@ bool CamCapture::capture(int  camNum, int width, int heigth, double fps, char sa
 		for (int i = 0; i < camNum; i++)					//显示实时采集到的画面
 		{
 			*cam[i] >> frameImg[i];
-			sprintf(fileName, "%s\\Cam%d.avi", saveDirName, i);
+			imgs.push_back(frameImg[i]);
+			if (imgs.size() == camNum)
+			{
+				this->showImgsOneWindow(imgs, showImg, 3);
+				imgs.clear();
+				namedWindow("test", WINDOW_KEEPRATIO);
+				resizeWindow("test", 1152, 432);
+				imshow("test", showImg);
+			}
+			/*sprintf(fileName, "%s\\Cam%d.avi", saveDirName, i);
 			namedWindow(fileName, WINDOW_KEEPRATIO);
-			imshow(fileName, frameImg[i]);
+			resizeWindow(fileName, 1280, 720);
+			imshow(fileName, frameImg[i]);*/
+
 			if (!frameImg[i].empty() && isStart)			//如果已经采集到画面 并且 开始录像，则开始将画面保存到指定的目录下
 			{
 				if (openNum < camNum)
@@ -176,6 +188,32 @@ bool CamCapture::capture(int  camNum, int width, int heigth, double fps, char sa
 	}
 	return true;
 }
+
+
+void CamCapture::showImgsOneWindow(vector<Mat>& Images, Mat& dst, int rows)
+{
+	int Num = Images.size();				//得到Vector容器中图片个数
+											//设定包含这些图片的窗口大小，这里都是BGR3通道，如果做灰度单通道，稍微改一下下面这行代码就可以
+	Mat Window(300 * ((Num - 1) / rows + 1), 300 * rows, CV_8UC3, Scalar(0, 0, 0));
+	//Mat Window(300 * 3, 300 * 2, CV_8UC3, Scalar(0, 0, 0));
+	Mat Std_Image;										//存放标准大小的图片
+	Mat imageROI;										//图片放置区域
+	Size Std_Size = Size(300, 300);						//每个图片显示大小300*300
+	int x_Begin = 0;
+	int y_Begin = 0;
+	for (int i = 0; i < Num; i++)
+	{
+		x_Begin = (i % rows)*Std_Size.width;			//每张图片起始坐标
+		y_Begin = (i / rows)*Std_Size.height;
+		resize(Images[i], Std_Image, Std_Size, 0, 0, INTER_LINEAR);						//将图像设为标准大小
+																						//将其贴在Window上
+		imageROI = Window(Rect(x_Begin, y_Begin, Std_Size.width, Std_Size.height));
+		Std_Image.copyTo(imageROI);
+	}
+	dst = Window;
+}
+
+
 
 
 void stitch(vector<Mat> imgs, Mat& resultMat)
