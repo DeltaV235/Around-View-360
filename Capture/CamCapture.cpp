@@ -46,20 +46,23 @@ CamCapture & CamCapture::capture(int camSeq, int width, int heigth, double fps, 
 }
 
 
-bool CamCapture::capture(int  camNum, int width, int heigth, double fps, char saveDirName[])
+bool CamCapture::capture(int camNum, int width, int heigth, double fps, char saveDirName[], bool isReleaseCam = true)
 {
 	VideoCapture *cam[camMaxNum];
 	Size videoResolution[camMaxNum];
 	VideoWriter output[camMaxNum];
-	StitchFrame stitchFrame;
+	StitchFrame stitchFrame[camMaxNum];
+	TimeDetection camTimeOut,showFps;
 	char fileName[80];
 	int count[camMaxNum] = { 0 }, openNum = 0;
-	bool isStart = false;
-	Mat frameImg[camMaxNum],showImg;
+	bool isStart = false, isFirstFrame[camMaxNum] = { true,true,true,true,true,true }, hasntRebuild = true;
+	double frameTime;
+	Mat frameImg[camMaxNum], showImg, blackImg(Size(width,heigth),CV_8UC3, Scalar(0,0,0));
 	vector<Mat> imgs;
+	vector<int> errCamNum;
 	for (int i = 0; i < camNum; i++)					//ÉèÖÃÉãÏñÍ·²ÎÊý£¬²¢´ò¿ªÉãÏñÍ·
 	{
-		
+
 		cam[i] = new VideoCapture(i);
 		cam[i]->set(CV_CAP_PROP_FRAME_WIDTH, width);
 		cam[i]->set(CV_CAP_PROP_FRAME_HEIGHT, heigth);
@@ -73,22 +76,24 @@ bool CamCapture::capture(int  camNum, int width, int heigth, double fps, char sa
 		//cam[i]->set(CV_CAP_PROP_FOCUS, 50);
 
 		videoResolution[i] = Size((int)cam[i]->get(CV_CAP_PROP_FRAME_WIDTH), (int)cam[i]->get(CV_CAP_PROP_FRAME_HEIGHT));		//»ñÈ¡ÊÓÆµ·Ö±æÂÊ
-		
+
 		if (cam[i]->isOpened() == false)
 		{
 			cout << "Cam " << i << " hasnt opened !" << endl;
-			cout << "Exit! " << endl;
+			/*cout << "Exit! " << endl;
 			for (int index = 0; index < i; index++)
 			{
 				cam[index]->release();
 			}
-			return false;
+			return false;*/
+			errCamNum.push_back(i);
 		}
 	}
 	waitKey(1000);
 
 	while (true)
 	{
+		showFps.setStartPos();
 		if (char(waitKey(1)) == ' ')				//ÊäÈë<sp> ¿ªÊ¼Â¼Ïñ
 		{
 			isStart = true;
@@ -96,15 +101,32 @@ bool CamCapture::capture(int  camNum, int width, int heigth, double fps, char sa
 		}
 		for (int i = 0; i < camNum; i++)					//ÏÔÊ¾ÊµÊ±²É¼¯µ½µÄ»­Ãæ
 		{
-			*cam[i] >> frameImg[i];
+			if (find(errCamNum.begin(), errCamNum.end(), i) != errCamNum.end())
+			{
+				frameImg[i] = blackImg;
+			}
+			else
+			{
+				camTimeOut.setStartPos();
+				*cam[i] >> frameImg[i];
+				camTimeOut.setEndPos();
+				frameTime = camTimeOut.getCurTime(true);
+				//cout << frameTime << endl;
+				if (frameTime > 800 && !isFirstFrame[i])
+				{
+					errCamNum.push_back(i);
+					cout << endl << "Cam" << i << " Timeout!" << endl;
+				}
+				isFirstFrame[i] = false;
+			}
 			imgs.push_back(frameImg[i]);
 			if (imgs.size() == camNum)
 			{
 				this->showImgsOneWindow(imgs, showImg, 3);
 				imgs.clear();
-				namedWindow("test", WINDOW_KEEPRATIO);
-				resizeWindow("test", 1152, 432);
-				imshow("test", showImg);
+				namedWindow("Cam", WINDOW_KEEPRATIO);
+				resizeWindow("Cam", 1920, 720);
+				imshow("Cam", showImg);
 			}
 			/*sprintf(fileName, "%s\\Cam%d.avi", saveDirName, i);
 			namedWindow(fileName, WINDOW_KEEPRATIO);
@@ -143,14 +165,95 @@ bool CamCapture::capture(int  camNum, int width, int heigth, double fps, char sa
 
 		if (char(waitKey(1)) == 'a')						//Èç¹û°´ÏÂ a £¬ÔòÕÒµ½ÆäÖÐµÄÁ½·ùÍ¼ÏñµÄÓ³Éä¾ØÕó£¬Æ´½Ó£¬²¢ÏÔÊ¾Æ´½ÓºóÍ¼Ïñ£¬Ó³Éä¾ØÕó±£´æÎª preViewH.xml
 		{
-			stitchFrame.setSRC_L(frameImg[0]);
+			/*stitchFrame.setSRC_L(frameImg[0]);
 			stitchFrame.setSRC_R(frameImg[1]);
 			stitchFrame.findH("preViewH.xml", STITCH_SIFT, true);
 			namedWindow("outimg", WINDOW_KEEPRATIO);
 			stitchFrame.show("outimg");
 			namedWindow("preView", WINDOW_KEEPRATIO);
-			imshow("preView", stitchFrame.stitch(20));
+			imshow("preView", stitchFrame.stitch(20));*/
 
+
+			switch (camNum )
+			{
+			case 2:
+			{
+				stitchFrame[0].setSRC_L(frameImg[0]);
+				stitchFrame[0].setSRC_R(frameImg[1]);
+				if (hasntRebuild)
+				{
+					stitchFrame[0].findH("Homography\\H.xml", STITCH_SIFT, true);
+					hasntRebuild = false;
+				}
+				stitchFrame[0].stitch(50);
+				resizeWindow("previewImg", stitchFrame[0].getResult().cols, stitchFrame[0].getResult().rows);
+				imshow("previewImg", stitchFrame[0].getResult());
+
+				break;
+			}
+			case 4:
+			{
+				stitchFrame[0].setSRC_L(frameImg[0]);
+				stitchFrame[0].setSRC_R(frameImg[1]);
+				stitchFrame[1].setSRC_L(frameImg[2]);
+				stitchFrame[1].setSRC_R(frameImg[3]);
+				if (hasntRebuild)
+				{
+					stitchFrame[0].findH("Homography\\H_U.xml", STITCH_SIFT, true);
+					stitchFrame[1].findH("Homography\\H_D.xml", STITCH_SIFT, true);
+					//stitchFrame[0].show("up");
+					//stitchFrame[1].show("down");
+				}
+
+				stitchFrame[2].setSRC_L(stitchFrame[0].stitch(50));
+				stitchFrame[2].setSRC_R(stitchFrame[1].stitch(50));
+				if (hasntRebuild)
+				{
+					stitchFrame[2].findH("Homography\\H_UD.xml", STITCH_SIFT, true);
+					stitchFrame[2].show("whole");
+					hasntRebuild = false;
+				}
+				stitchFrame[2].stitch_v(50);
+				resizeWindow("previewImg", stitchFrame[2].getResult().cols / 1.5, stitchFrame[2].getResult().rows / 1.5);
+				imshow("previewImg", stitchFrame[2].getResult());
+
+				break;
+			}
+			case 6:
+			{
+				stitchFrame[0].setSRC_L(frameImg[0]).setSRC_R(frameImg[1]);
+				stitchFrame[1].setSRC_L(frameImg[1]).setSRC_R(frameImg[2]);
+				stitchFrame[2].setSRC_L(frameImg[3]).setSRC_R(frameImg[4]);
+				stitchFrame[3].setSRC_L(frameImg[4]).setSRC_R(frameImg[5]);
+				if (hasntRebuild)
+				{
+					stitchFrame[0].findH("Homography\\H_1LC.xml", STITCH_SIFT, true);
+					stitchFrame[1].findH("Homography\\H_1CR.xml", STITCH_SIFT, true);
+					stitchFrame[2].findH("Homography\\H_2LC.xml", STITCH_SIFT, true);
+					stitchFrame[3].findH("Homography\\H_2CR.xml", STITCH_SIFT, true);
+					//stitchFrame[0].show("up");
+					//stitchFrame[1].show("down");
+				}
+
+				if (hasntRebuild)
+				{
+					stitchFrame[4].setSRC_L(stitchFrame[0].setSRC_R(stitchFrame[1].stitch(50)).stitch(50)).setSRC_R(stitchFrame[2]
+						.setSRC_R(stitchFrame[3].stitch(50)).stitch(50)).findH("Homography\\H_WHOLE.xml", STITCH_SIFT, true);
+					//stitchFrame[2].show("whole");
+					hasntRebuild = false;
+				}
+				stitchFrame[4].stitch_v(50);
+				resizeWindow("previewImg", stitchFrame[4].getResult().cols / 2, stitchFrame[4].getResult().rows / 2);
+				imshow("previewImg", stitchFrame[4].getResult());
+
+				break;
+			}
+			default:
+			{
+				cout << "arg error" << endl;
+				return false;
+			}
+			}
 
 			/*Mat result, result2;
 			vector<Mat> imgs;
@@ -185,6 +288,14 @@ bool CamCapture::capture(int  camNum, int width, int heigth, double fps, char sa
 				cout << "writeTotalFrame for Cam " << i << " : " << count[i] << endl;
 			break;
 		}
+		showFps.setEndPos().getAvgFps().getAvgTime().getCurTime();
+	}
+	if (count[0] == 0)
+	{
+		if(_rmdir(saveDirName)==0)
+			printf("\nNone video has been captured.\nSuccessfully delete the folder : .\\%s \n", saveDirName);
+		else
+			printf("\nCan not delete folder, the folder may occupied.\n");
 	}
 	return true;
 }
@@ -192,23 +303,23 @@ bool CamCapture::capture(int  camNum, int width, int heigth, double fps, char sa
 
 void CamCapture::showImgsOneWindow(vector<Mat>& Images, Mat& dst, int rows)
 {
-	int Num = Images.size();				//µÃµ½VectorÈÝÆ÷ÖÐÍ¼Æ¬¸öÊý
+	int Num = int(Images.size());				//µÃµ½VectorÈÝÆ÷ÖÐÍ¼Æ¬¸öÊý
 											//Éè¶¨°üº¬ÕâÐ©Í¼Æ¬µÄ´°¿Ú´óÐ¡£¬ÕâÀï¶¼ÊÇBGR3Í¨µÀ£¬Èç¹û×ö»Ò¶Èµ¥Í¨µÀ£¬ÉÔÎ¢¸ÄÒ»ÏÂÏÂÃæÕâÐÐ´úÂë¾Í¿ÉÒÔ
-	Mat Window(300 * ((Num - 1) / rows + 1), 300 * rows, CV_8UC3, Scalar(0, 0, 0));
-	//Mat Window(300 * 3, 300 * 2, CV_8UC3, Scalar(0, 0, 0));
+	//Mat Window(1280 * ((Num - 1) / rows + 1), 720 * rows, CV_8UC3, Scalar(0, 0, 0));
+	Mat Window(Size(1280 * 3, 720 * 2), CV_8UC3, Scalar(0, 0, 0));
 	Mat Std_Image;										//´æ·Å±ê×¼´óÐ¡µÄÍ¼Æ¬
 	Mat imageROI;										//Í¼Æ¬·ÅÖÃÇøÓò
-	Size Std_Size = Size(300, 300);						//Ã¿¸öÍ¼Æ¬ÏÔÊ¾´óÐ¡300*300
+	Size Std_Size = Size(1280, 720);						//Ã¿¸öÍ¼Æ¬ÏÔÊ¾´óÐ¡300*300
 	int x_Begin = 0;
 	int y_Begin = 0;
 	for (int i = 0; i < Num; i++)
 	{
 		x_Begin = (i % rows)*Std_Size.width;			//Ã¿ÕÅÍ¼Æ¬ÆðÊ¼×ø±ê
 		y_Begin = (i / rows)*Std_Size.height;
-		resize(Images[i], Std_Image, Std_Size, 0, 0, INTER_LINEAR);						//½«Í¼ÏñÉèÎª±ê×¼´óÐ¡
+		//resize(Images[i], Std_Image, Std_Size, 0, 0, INTER_LINEAR);						//½«Í¼ÏñÉèÎª±ê×¼´óÐ¡
 																						//½«ÆäÌùÔÚWindowÉÏ
 		imageROI = Window(Rect(x_Begin, y_Begin, Std_Size.width, Std_Size.height));
-		Std_Image.copyTo(imageROI);
+		Images[i].copyTo(imageROI);
 	}
 	dst = Window;
 }
@@ -277,6 +388,6 @@ void stitch2(Mat& srcImage1, Mat& srcImage2, Mat& panorama)				//ÁíÒ»ÖÖÏàËÆµÄÆ´½
 	warpPerspective(srcImage2, srcImage2Warped, H, Size(srcImage2.cols * 2, srcImage2.rows), INTER_CUBIC);
 	panorama = srcImage2Warped.clone();
 	// ½á¹ûÊä³ö
-	Mat roi(panorama, Rect(0, 0,srcImage1.cols, srcImage1.rows));
+	Mat roi(panorama, Rect(0, 0, srcImage1.cols, srcImage1.rows));
 	srcImage1.copyTo(roi);
 }

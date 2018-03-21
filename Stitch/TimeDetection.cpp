@@ -47,3 +47,8 @@ TimeDetection& TimeDetection::setEndPos()					//获取一次操作中结束的时间，并计算
 	count++;
 	return *this;
 }
+
+double TimeDetection::getCurTime(const bool overloaded)		//获取当前一次操作所使用的时间,返回值为浮点数
+{
+	return data[count - 1];
+}

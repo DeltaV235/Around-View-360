@@ -49,54 +49,56 @@ VideoStitch & VideoStitch::release()												//释放所有视频
 	// TODO: 在此处插入 return 语句
 }
 
-bool VideoStitch::stitchVideo(string savePath)								//拼接单帧画面 并 输出到视频容器中，形成一段完整的视频 调用 Stitch 项目 中的StitchFrame类
+bool VideoStitch::stitchVideo(string savePath, bool isRebuild)								//拼接单帧画面 并 输出到视频容器中，形成一段完整的视频 调用 Stitch 项目 中的StitchFrame类
 {
-	bool flag = true, isOpened = true;
+	bool hasntRebuild = true, isOpened = true;
 	int count = 0;
 	while (true)
 	{
 		//for (int i = 0; i < (int)fileName.size() - 1; i++)
 		//{
-		namedWindow(savePath, WINDOW_FULLSCREEN);
-		switch ((int)fileName.size() - 1)
+		namedWindow(savePath, WINDOW_KEEPRATIO);
+		switch ((int)fileName.size())
 		{
-		case 1:
+		case 2:
 		{
 			stitchFrame[0].setSRC_L(src[0]);
 			stitchFrame[0].setSRC_R(src[1]);
-			if (flag)
+			if (hasntRebuild)
 			{
-				stitchFrame[0].findH("Homography\\H.xml", STITCH_SIFT, true);
-				flag = false;
+				stitchFrame[0].findH("Homography\\H.xml", STITCH_SIFT, isRebuild);
+				hasntRebuild = false;
 			}
 			stitchFrame[0].stitch(50);
+			resizeWindow(savePath, stitchFrame[0].getResult().cols, stitchFrame[0].getResult().rows);
 			imshow(savePath, stitchFrame[0].getResult());
 
 			break;
 		}
-		case 3:
+		case 4:
 		{
 			stitchFrame[0].setSRC_L(src[0]);
 			stitchFrame[0].setSRC_R(src[1]);
 			stitchFrame[1].setSRC_L(src[2]);
 			stitchFrame[1].setSRC_R(src[3]);
-			if (flag)
+			if (hasntRebuild)
 			{
-				stitchFrame[0].findH("Homography\\H_U.xml", STITCH_SIFT, false);
-				stitchFrame[1].findH("Homography\\H_D.xml", STITCH_SIFT, false);
+				stitchFrame[0].findH("Homography\\H_U.xml", STITCH_SIFT, isRebuild);
+				stitchFrame[1].findH("Homography\\H_D.xml", STITCH_SIFT, isRebuild);
 				//stitchFrame[0].show("up");
 				//stitchFrame[1].show("down");
 			}
 
 			stitchFrame[2].setSRC_L(stitchFrame[0].stitch(50));
 			stitchFrame[2].setSRC_R(stitchFrame[1].stitch(50));
-			if (flag)
+			if (hasntRebuild)
 			{
-				stitchFrame[2].findH("Homography\\H_UD.xml", STITCH_SIFT, false);
+				stitchFrame[2].findH("Homography\\H_UD.xml", STITCH_SIFT, isRebuild);
 				stitchFrame[2].show("whole");
-				flag = false;
+				hasntRebuild = false;
 			}
 			stitchFrame[2].stitch_v(50);
+			resizeWindow(savePath, stitchFrame[2].getResult().cols / 1.5, stitchFrame[2].getResult().rows / 1.5);
 			imshow(savePath, stitchFrame[2].getResult());
 
 			break;
@@ -107,31 +109,39 @@ bool VideoStitch::stitchVideo(string savePath)								//拼接单帧画面 并 输出到视
 			stitchFrame[1].setSRC_L(src[1]).setSRC_R(src[2]);
 			stitchFrame[2].setSRC_L(src[3]).setSRC_R(src[4]);
 			stitchFrame[3].setSRC_L(src[4]).setSRC_R(src[5]);
-			if (flag)
+			if (hasntRebuild)
 			{
-				stitchFrame[0].findH("Homography\\H_1LC.xml", STITCH_SIFT, false);
-				stitchFrame[1].findH("Homography\\H_1CR.xml", STITCH_SIFT, false);
-				stitchFrame[2].findH("Homography\\H_2LC.xml", STITCH_SIFT, false);
-				stitchFrame[3].findH("Homography\\H_2CR.xml", STITCH_SIFT, false);
+				stitchFrame[0].findH("Homography\\H_1LC.xml", STITCH_SIFT, isRebuild);
+				stitchFrame[1].findH("Homography\\H_1CR.xml", STITCH_SIFT, isRebuild);
+				stitchFrame[2].findH("Homography\\H_2LC.xml", STITCH_SIFT, isRebuild);
+				stitchFrame[3].findH("Homography\\H_2CR.xml", STITCH_SIFT, isRebuild);
 				//stitchFrame[0].show("up");
 				//stitchFrame[1].show("down");
 			}
-			
-			if (flag)
+
+			if (hasntRebuild)
 			{
 				stitchFrame[4].setSRC_L(stitchFrame[0].setSRC_R(stitchFrame[1].stitch(50)).stitch(50)).setSRC_R(stitchFrame[2]
-					.setSRC_R(stitchFrame[3].stitch(50)).stitch(50)).findH("Homography\\H_WHOLE.xml", STITCH_SIFT, false);
+					.setSRC_R(stitchFrame[3].stitch(50)).stitch(50)).findH("Homography\\H_WHOLE.xml", STITCH_SIFT, isRebuild);
 				//stitchFrame[2].show("whole");
-				flag = false;
+				hasntRebuild = false;
 			}
 			stitchFrame[4].stitch_v(50);
+			resizeWindow(savePath, stitchFrame[4].getResult().cols / 2, stitchFrame[4].getResult().rows / 2);
 			imshow(savePath, stitchFrame[4].getResult());
 
 			break;
 		}
 		default:
 		{
-			cout << "arg error" << endl;
+			if (fileName.size() == 0)
+			{
+				
+			}
+			else
+			{
+				cout << "arg error" << endl;
+			}
 			return false;
 		}
 		}

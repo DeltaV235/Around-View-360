@@ -19,4 +19,6 @@ public:
 	TimeDetection& getAvgFps();										//获得平均帧率
 	TimeDetection& getCurTime();									//获得当前处理所用的时间
 	double getSum(double data[]);									//计算 TIME_ARR_SIZE 个元素 的 数组data[] 的 和
+	double TimeDetection::getCurTime(const bool overloaded);								//获取当前一次操作所使用的时间,返回值为浮点数
+
 };
