@@ -53,6 +53,8 @@ bool VideoStitch::stitchVideo(string savePath, bool isRebuild)								//拼接单帧
 {
 	bool hasntRebuild = true, isOpened = true;
 	int count = 0;
+	char imgName[10];
+	int imgNum = 0;
 	while (true)
 	{
 		//for (int i = 0; i < (int)fileName.size() - 1; i++)
@@ -124,7 +126,7 @@ bool VideoStitch::stitchVideo(string savePath, bool isRebuild)								//拼接单帧
 				stitchFrame[4].setSRC_L(stitchFrame[0].setSRC_R(stitchFrame[1].stitch(50)).stitch(50)).setSRC_R(stitchFrame[2]
 					.setSRC_R(stitchFrame[3].stitch(50)).stitch(50)).findH("Homography\\H_WHOLE.xml", STITCH_SIFT, isRebuild);
 				//stitchFrame[2].show("whole");
-				hasntRebuild = false;
+				hasntRebuild = true; //临时修改
 			}
 			stitchFrame[4].stitch_v(50);
 			resizeWindow(savePath, stitchFrame[4].getResult().cols / 2, stitchFrame[4].getResult().rows / 2);
@@ -153,6 +155,10 @@ bool VideoStitch::stitchVideo(string savePath, bool isRebuild)								//拼接单帧
 			else
 				isOpened = false;
 		}
+		
+		/*sprintf(imgName,"%03d" ,imgNum);
+		imgNum++;
+		imwrite(imgName, stitchFrame[(int)fileName.size() - 2].getResult());*/
 		outPut << stitchFrame[(int)fileName.size() - 2].getResult();			//写入处理完的图片
 		count++;
 		//}

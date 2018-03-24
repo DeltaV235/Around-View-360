@@ -54,12 +54,14 @@ bool CamCapture::capture(int camNum, int width, int heigth, double fps, char sav
 	StitchFrame stitchFrame[camMaxNum];
 	TimeDetection camTimeOut,showFps;
 	char fileName[80];
-	int count[camMaxNum] = { 0 }, openNum = 0;
+	int count[camMaxNum] = { 0 }, openNum = 0, totalFrames=0;
 	bool isStart = false, isFirstFrame[camMaxNum] = { true,true,true,true,true,true }, hasntRebuild = true;
 	double frameTime;
 	Mat frameImg[camMaxNum], showImg, blackImg(Size(width,heigth),CV_8UC3, Scalar(0,0,0));
 	vector<Mat> imgs;
 	vector<int> errCamNum;
+	vector<int>::iterator iter;
+
 	for (int i = 0; i < camNum; i++)					//设置摄像头参数，并打开摄像头
 	{
 
@@ -115,6 +117,7 @@ bool CamCapture::capture(int camNum, int width, int heigth, double fps, char sav
 				if (frameTime > 800 && !isFirstFrame[i])
 				{
 					errCamNum.push_back(i);
+					cam[i]->release();
 					cout << endl << "Cam" << i << " Timeout!" << endl;
 				}
 				isFirstFrame[i] = false;
@@ -127,6 +130,35 @@ bool CamCapture::capture(int camNum, int width, int heigth, double fps, char sav
 				namedWindow("Cam", WINDOW_KEEPRATIO);
 				resizeWindow("Cam", 1920, 720);
 				imshow("Cam", showImg);
+			}
+			if (totalFrames == 48)
+			{
+				for (iter = errCamNum.begin(); iter != errCamNum.end(); )
+				{
+					cam[*iter] = new VideoCapture(*iter);
+					cam[*iter]->set(CV_CAP_PROP_FRAME_WIDTH, width);
+					cam[*iter]->set(CV_CAP_PROP_FRAME_HEIGHT, heigth);
+					cam[*iter]->set(CV_CAP_PROP_FPS, fps);
+
+					//cam[i]->set(CV_CAP_PROP_BRIGHTNESS, 128);			//亮度 1
+					//cam[i]->set(CV_CAP_PROP_CONTRAST, 50);			//对比度 40
+					//cam[i]->set(CV_CAP_PROP_SATURATION, 50);			//饱和度 50
+					//cam[i]->set(CV_CAP_PROP_HUE, 50);					//色调 50
+					//cam[i]->set(CV_CAP_PROP_EXPOSURE, -2);			//曝光 50
+					//cam[i]->set(CV_CAP_PROP_FOCUS, 50);
+
+					videoResolution[*iter] = Size((int)cam[*iter]->get(CV_CAP_PROP_FRAME_WIDTH), (int)cam[*iter]->get(CV_CAP_PROP_FRAME_HEIGHT));		//获取视频分辨率
+					if (cam[*iter]->isOpened() == true)
+					{
+						iter = errCamNum.erase(iter++);
+					}
+					else
+					{
+						iter++;
+						cout << "Cam " << *iter << " hasnt opened !" << endl;
+					}
+				}
+				totalFrames = 0;
 			}
 			/*sprintf(fileName, "%s\\Cam%d.avi", saveDirName, i);
 			namedWindow(fileName, WINDOW_KEEPRATIO);
@@ -152,7 +184,8 @@ bool CamCapture::capture(int camNum, int width, int heigth, double fps, char sav
 				break;
 			}*/
 		}
-		if (count[0] == 150)							//当保存了X帧后，停止录像，并返回
+		totalFrames++;
+		if (count[0] == 48)							//当保存了X帧后，停止录像，并返回
 		{
 			for (int i = 0; i < camNum; i++)
 			{
@@ -172,6 +205,7 @@ bool CamCapture::capture(int camNum, int width, int heigth, double fps, char sav
 			stitchFrame.show("outimg");
 			namedWindow("preView", WINDOW_KEEPRATIO);
 			imshow("preView", stitchFrame.stitch(20));*/
+			namedWindow("previewImg", WINDOW_KEEPRATIO);
 
 
 			switch (camNum )
@@ -240,10 +274,10 @@ bool CamCapture::capture(int camNum, int width, int heigth, double fps, char sav
 					stitchFrame[4].setSRC_L(stitchFrame[0].setSRC_R(stitchFrame[1].stitch(50)).stitch(50)).setSRC_R(stitchFrame[2]
 						.setSRC_R(stitchFrame[3].stitch(50)).stitch(50)).findH("Homography\\H_WHOLE.xml", STITCH_SIFT, true);
 					//stitchFrame[2].show("whole");
-					hasntRebuild = false;
+					hasntRebuild = true; //临时修改
 				}
 				stitchFrame[4].stitch_v(50);
-				resizeWindow("previewImg", stitchFrame[4].getResult().cols / 2, stitchFrame[4].getResult().rows / 2);
+				resizeWindow("previewImg", stitchFrame[4].getResult().cols / 3, stitchFrame[4].getResult().rows / 3);
 				imshow("previewImg", stitchFrame[4].getResult());
 
 				break;
