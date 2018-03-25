@@ -206,7 +206,7 @@
 	}
 
 
-	Mat StitchFrame::stitch(int width, int flag)
+	Mat StitchFrame::stitch(int width, int isShowTime)
 	{
 		start = clock();
 
@@ -242,7 +242,7 @@
 			//带权重相加后便得到融合后的像素点
 		}
 		finish = clock();
-		if (flag)		//flag==1时，打印出处理所用的总时间
+		if (isShowTime)		//flag==1时，打印出处理所用的总时间
 		{
 			printf("stitch: %.2f ms\n", (double)(finish - start));
 		}

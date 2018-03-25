@@ -24,8 +24,9 @@ private:
 public:
 	//CamCapture& videoSave();
 	CamCapture & capture(int camSeq, int width, int heigth, double fps, string savePath);		//单摄像头采集视频 savePath为保存的路径
-	bool capture(int camNum, int width, int heigth, double fps, char saveDirName[], bool isReleaseCam);	//多摄像头同时采集视频 saveDirPath为保存的文件夹路径
-	void showImgsOneWindow(vector<Mat>& Images, Mat& dst, int rows);
+	bool capture(int camNum, int width, int heigth, int cols, int rows, double fps, char saveDirName[], bool isReleaseCam);	//多摄像头同时采集视频 saveDirPath为保存的文件夹路径
+	void showImgsOneWindow(vector<Mat>& Images, Mat& dst, int width, int height, int cols, int rows);
+	void printStringOnImgCenter(Mat & img, const String & text, int fontFace, double fontScale, Scalar color, int thickness = 1, int lineType = LINE_8, bool bottomLeftOrigin = false);
 };
 
 void stitch(vector<Mat> imgs, Mat& resultMat);						//OpenCV自带的Stitch方法

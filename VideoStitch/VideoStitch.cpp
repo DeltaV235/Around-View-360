@@ -49,18 +49,14 @@ VideoStitch & VideoStitch::release()												//释放所有视频
 	// TODO: 在此处插入 return 语句
 }
 
-bool VideoStitch::stitchVideo(string savePath, bool isRebuild)								//拼接单帧画面 并 输出到视频容器中，形成一段完整的视频 调用 Stitch 项目 中的StitchFrame类
+bool VideoStitch::stitchVideo(string savePath, bool isRebuild = true)								//拼接单帧画面 并 输出到视频容器中，形成一段完整的视频 调用 Stitch 项目 中的StitchFrame类
 {
 	bool hasntRebuild = true, isOpened = true;
-	int count = 0;
-	char imgName[10];
-	int imgNum = 0;
-	while (true)
+	int totalFrame = 0;
+	while (true)										//循环拼接视频的所有帧，直到this->nextFrame()==false，即所有帧已经拼接完成
 	{
-		//for (int i = 0; i < (int)fileName.size() - 1; i++)
-		//{
 		namedWindow(savePath, WINDOW_KEEPRATIO);
-		switch ((int)fileName.size())
+		switch ((int)fileName.size())					//根据不同的摄像头数量，采用不同的拼接逻辑
 		{
 		case 2:
 		{
@@ -74,7 +70,6 @@ bool VideoStitch::stitchVideo(string savePath, bool isRebuild)								//拼接单帧
 			stitchFrame[0].stitch(50);
 			resizeWindow(savePath, stitchFrame[0].getResult().cols, stitchFrame[0].getResult().rows);
 			imshow(savePath, stitchFrame[0].getResult());
-
 			break;
 		}
 		case 4:
@@ -87,8 +82,6 @@ bool VideoStitch::stitchVideo(string savePath, bool isRebuild)								//拼接单帧
 			{
 				stitchFrame[0].findH("Homography\\H_U.xml", STITCH_SIFT, isRebuild);
 				stitchFrame[1].findH("Homography\\H_D.xml", STITCH_SIFT, isRebuild);
-				//stitchFrame[0].show("up");
-				//stitchFrame[1].show("down");
 			}
 
 			stitchFrame[2].setSRC_L(stitchFrame[0].stitch(50));
@@ -96,13 +89,12 @@ bool VideoStitch::stitchVideo(string savePath, bool isRebuild)								//拼接单帧
 			if (hasntRebuild)
 			{
 				stitchFrame[2].findH("Homography\\H_UD.xml", STITCH_SIFT, isRebuild);
-				stitchFrame[2].show("whole");
+				//stitchFrame[2].show("whole");				//显示匹配结果，可以不运行
 				hasntRebuild = false;
 			}
 			stitchFrame[2].stitch_v(50);
-			resizeWindow(savePath, stitchFrame[2].getResult().cols / 1.5, stitchFrame[2].getResult().rows / 1.5);
+			resizeWindow(savePath, stitchFrame[2].getResult().cols / 1.5, stitchFrame[2].getResult().rows / 1.5);		//调整窗口大小
 			imshow(savePath, stitchFrame[2].getResult());
-
 			break;
 		}
 		case 6:
@@ -117,21 +109,16 @@ bool VideoStitch::stitchVideo(string savePath, bool isRebuild)								//拼接单帧
 				stitchFrame[1].findH("Homography\\H_1CR.xml", STITCH_SIFT, isRebuild);
 				stitchFrame[2].findH("Homography\\H_2LC.xml", STITCH_SIFT, isRebuild);
 				stitchFrame[3].findH("Homography\\H_2CR.xml", STITCH_SIFT, isRebuild);
-				//stitchFrame[0].show("up");
-				//stitchFrame[1].show("down");
 			}
-
+			stitchFrame[4].setSRC_L(stitchFrame[0].setSRC_R(stitchFrame[1].stitch(50)).stitch(50)).setSRC_R(stitchFrame[2].setSRC_R(stitchFrame[3].stitch(50)).stitch(50));
 			if (hasntRebuild)
 			{
-				stitchFrame[4].setSRC_L(stitchFrame[0].setSRC_R(stitchFrame[1].stitch(50)).stitch(50)).setSRC_R(stitchFrame[2]
-					.setSRC_R(stitchFrame[3].stitch(50)).stitch(50)).findH("Homography\\H_WHOLE.xml", STITCH_SIFT, isRebuild);
-				//stitchFrame[2].show("whole");
-				hasntRebuild = true; //临时修改
+				stitchFrame[4].findH("Homography\\H_WHOLE.xml", STITCH_SIFT, isRebuild);
+				hasntRebuild = false; 
 			}
 			stitchFrame[4].stitch_v(50);
 			resizeWindow(savePath, stitchFrame[4].getResult().cols / 2, stitchFrame[4].getResult().rows / 2);
 			imshow(savePath, stitchFrame[4].getResult());
-
 			break;
 		}
 		default:
@@ -147,6 +134,7 @@ bool VideoStitch::stitchVideo(string savePath, bool isRebuild)								//拼接单帧
 			return false;
 		}
 		}
+
 		if (isOpened)														//创建视频文件
 		{
 			outPut.open(savePath, CV_FOURCC('D', 'I', 'V', 'X'), 24, Size(stitchFrame[(int)fileName.size() - 2].getResult().cols, stitchFrame[(int)fileName.size() - 2].getResult().rows), true);
@@ -155,23 +143,19 @@ bool VideoStitch::stitchVideo(string savePath, bool isRebuild)								//拼接单帧
 			else
 				isOpened = false;
 		}
-		
-		/*sprintf(imgName,"%03d" ,imgNum);
-		imgNum++;
-		imwrite(imgName, stitchFrame[(int)fileName.size() - 2].getResult());*/
 		outPut << stitchFrame[(int)fileName.size() - 2].getResult();			//写入处理完的图片
-		count++;
-		//}
+		totalFrame++;
+
 		if (char(waitKey(1)) == 'q')
 		{
 			destroyWindow(savePath);
-			cout << "writeTotalFrame(result): " << count << endl;
+			cout << "writeTotalFrame(result): " << totalFrame << endl;
 			break;
 		}
 		if (!this->nextFrame())
 		{
 			destroyWindow(savePath);
-			cout << "writeTotalFrame(result): " << count << endl;
+			cout << "writeTotalFrame(result): " << totalFrame << endl;
 			break;
 		}
 	}

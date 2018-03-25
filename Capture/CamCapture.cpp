@@ -46,25 +46,28 @@ CamCapture & CamCapture::capture(int camSeq, int width, int heigth, double fps, 
 }
 
 
-bool CamCapture::capture(int camNum, int width, int heigth, double fps, char saveDirName[], bool isReleaseCam = true)
+bool CamCapture::capture(int camNum, int width, int heigth, int cols, int rows, double fps, char saveDirName[], bool isReleaseCam = true)
 {
-	VideoCapture *cam[camMaxNum];
-	Size videoResolution[camMaxNum];
-	VideoWriter output[camMaxNum];
+	VideoCapture *cam[camMaxNum];														//Ö¸ÏòVideoCapture¶ÔÏóµÄÖ¸Õë
+	Size videoResolution[camMaxNum];													//Size¶ÔÏó£¬±íÊ¾ÊÓÆµµÄ·Ö±æÂÊ
+	VideoWriter output[camMaxNum];														//VideoWriter¶ÔÏó£¬±£´æÊÓÆµµÄ¶ÔÏó
 	StitchFrame stitchFrame[camMaxNum];
-	TimeDetection camTimeOut,showFps;
+	TimeDetection camTimeOut, showFps;
 	char fileName[80];
-	int count[camMaxNum] = { 0 }, openNum = 0, totalFrames=0;
-	bool isStart = false, isFirstFrame[camMaxNum] = { true,true,true,true,true,true }, hasntRebuild = true;
+	int count[camMaxNum] = { 0 }, openNum = 0, totalFrames = 0;
+	bool isStart = false, isFirstFrame[camMaxNum] = { true,true,true,true,true,true }, hasntRebuild = true, continueReconnect = true;
 	double frameTime;
-	Mat frameImg[camMaxNum], showImg, blackImg(Size(width,heigth),CV_8UC3, Scalar(0,0,0));
+	Mat frameImg[camMaxNum], showImg, noSignalImg(Size(width, heigth), CV_8UC3, Scalar(0, 0, 0));
 	vector<Mat> imgs;
-	vector<int> errCamNum;
-	vector<int>::iterator iter;
+	vector<int> errCamNum;																//ÆäÖĞ±£´æ Î´Á¬½Ó ºÍ ³¬Ê± µÄ ÉãÏñÍ· µÄ index
+	vector<int>::iterator iter;															//Ö¸Ïòvector<int>µÄµü´úÆ÷
 
+	printStringOnImgCenter(noSignalImg, "No Signal", FONT_HERSHEY_SIMPLEX, 4, Scalar(255, 255, 255), 10);
+	namedWindow("No signal", WINDOW_KEEPRATIO);
+	imshow("No signal", noSignalImg);
+	resizeWindow("No signal", 640, 320);
 	for (int i = 0; i < camNum; i++)					//ÉèÖÃÉãÏñÍ·²ÎÊı£¬²¢´ò¿ªÉãÏñÍ·
 	{
-
 		cam[i] = new VideoCapture(i);
 		cam[i]->set(CV_CAP_PROP_FRAME_WIDTH, width);
 		cam[i]->set(CV_CAP_PROP_FRAME_HEIGHT, heigth);
@@ -79,7 +82,7 @@ bool CamCapture::capture(int camNum, int width, int heigth, double fps, char sav
 
 		videoResolution[i] = Size((int)cam[i]->get(CV_CAP_PROP_FRAME_WIDTH), (int)cam[i]->get(CV_CAP_PROP_FRAME_HEIGHT));		//»ñÈ¡ÊÓÆµ·Ö±æÂÊ
 
-		if (cam[i]->isOpened() == false)
+		if (cam[i]->isOpened() == false)								//Èç¹ûµ±Ç°ÉãÏñÍ·Î´´ò¿ª£¬Êä³ö´íÎóĞÅÏ¢£¬²¢½«¸ÃÉãÏñÍ·indexÑ¹ÈëerrCamNumÖĞ
 		{
 			cout << "Cam " << i << " hasnt opened !" << endl;
 			/*cout << "Exit! " << endl;
@@ -92,6 +95,8 @@ bool CamCapture::capture(int camNum, int width, int heigth, double fps, char sav
 		}
 	}
 	waitKey(1000);
+	namedWindow("Cam", WINDOW_KEEPRATIO);
+	resizeWindow("Cam", width*cols / 2, heigth*rows / 2);
 
 	while (true)
 	{
@@ -103,18 +108,18 @@ bool CamCapture::capture(int camNum, int width, int heigth, double fps, char sav
 		}
 		for (int i = 0; i < camNum; i++)					//ÏÔÊ¾ÊµÊ±²É¼¯µ½µÄ»­Ãæ
 		{
-			if (find(errCamNum.begin(), errCamNum.end(), i) != errCamNum.end())
+			if (find(errCamNum.begin(), errCamNum.end(), i) != errCamNum.end())			//Èç¹ûerrCamNumÖĞÓĞ´Ë´ÎÑ­»·¶ÔÓ¦µÄindex£¬ÔòËµÃ÷¸ÃÉãÏñÍ·¹ÊÕÏ£¬Ôò½«¶ÔÓ¦µÄframeImg¸ÄÎªnoSignalImg»ònoSignalImg
 			{
-				frameImg[i] = blackImg;
+				frameImg[i] = noSignalImg;
 			}
-			else
+			else																		//·ñÔò°´Õı³£Çé¿ö Êä³ö¼àÊÓ»­Ãæ
 			{
 				camTimeOut.setStartPos();
 				*cam[i] >> frameImg[i];
 				camTimeOut.setEndPos();
 				frameTime = camTimeOut.getCurTime(true);
 				//cout << frameTime << endl;
-				if (frameTime > 800 && !isFirstFrame[i])
+				if (frameTime > 800 && !isFirstFrame[i])				//ÔÚ²»ÊÇ²É¼¯µÄµÚÒ»Ö¡µÄÇé¿öÏÂ£¬Èç¹ûĞ´ÈëÒ»Ö¡µÄÊ±¼ä³¬¹ı800ms£¬ÔòÅĞ¶¨¸ÃÉãÏñÍ·³¬Ê±¡¢¹ÊÕÏ£¬²¢½«ÆäÑ¹ÈëerrCamNumÖĞ£¬²¢Êä³ö´íÎóĞÅÏ¢¡¢ÊÍ·Å¸ÃÉãÏñÍ·
 				{
 					errCamNum.push_back(i);
 					cam[i]->release();
@@ -122,16 +127,14 @@ bool CamCapture::capture(int camNum, int width, int heigth, double fps, char sav
 				}
 				isFirstFrame[i] = false;
 			}
-			imgs.push_back(frameImg[i]);
+			imgs.push_back(frameImg[i]);					//½«frameImgÑ¹ÈëimgsÖĞ
 			if (imgs.size() == camNum)
 			{
-				this->showImgsOneWindow(imgs, showImg, 3);
+				this->showImgsOneWindow(imgs, showImg, width, heigth, cols, rows);
 				imgs.clear();
-				namedWindow("Cam", WINDOW_KEEPRATIO);
-				resizeWindow("Cam", 1920, 720);
 				imshow("Cam", showImg);
 			}
-			if (totalFrames == 48)
+			if (totalFrames == 48 && continueReconnect)												//48Ö¡ºóÖØĞÂÁ¬½Ó¹ÊÕÏµÄÉãÏñÍ·
 			{
 				for (iter = errCamNum.begin(); iter != errCamNum.end(); )
 				{
@@ -158,6 +161,7 @@ bool CamCapture::capture(int camNum, int width, int heigth, double fps, char sav
 						cout << "Cam " << *iter << " hasnt opened !" << endl;
 					}
 				}
+				continueReconnect = false;
 				totalFrames = 0;
 			}
 			/*sprintf(fileName, "%s\\Cam%d.avi", saveDirName, i);
@@ -205,10 +209,10 @@ bool CamCapture::capture(int camNum, int width, int heigth, double fps, char sav
 			stitchFrame.show("outimg");
 			namedWindow("preView", WINDOW_KEEPRATIO);
 			imshow("preView", stitchFrame.stitch(20));*/
+
+
 			namedWindow("previewImg", WINDOW_KEEPRATIO);
-
-
-			switch (camNum )
+			switch (camNum)
 			{
 			case 2:
 			{
@@ -217,7 +221,7 @@ bool CamCapture::capture(int camNum, int width, int heigth, double fps, char sav
 				if (hasntRebuild)
 				{
 					stitchFrame[0].findH("Homography\\H.xml", STITCH_SIFT, true);
-					hasntRebuild = false;
+					hasntRebuild = true; //ÁÙÊ±ĞŞ¸Ä
 				}
 				stitchFrame[0].stitch(50);
 				resizeWindow("previewImg", stitchFrame[0].getResult().cols, stitchFrame[0].getResult().rows);
@@ -245,7 +249,7 @@ bool CamCapture::capture(int camNum, int width, int heigth, double fps, char sav
 				{
 					stitchFrame[2].findH("Homography\\H_UD.xml", STITCH_SIFT, true);
 					stitchFrame[2].show("whole");
-					hasntRebuild = false;
+					hasntRebuild = true; //ÁÙÊ±ĞŞ¸Ä
 				}
 				stitchFrame[2].stitch_v(50);
 				resizeWindow("previewImg", stitchFrame[2].getResult().cols / 1.5, stitchFrame[2].getResult().rows / 1.5);
@@ -326,7 +330,7 @@ bool CamCapture::capture(int camNum, int width, int heigth, double fps, char sav
 	}
 	if (count[0] == 0)
 	{
-		if(_rmdir(saveDirName)==0)
+		if (_rmdir(saveDirName) == 0)
 			printf("\nNone video has been captured.\nSuccessfully delete the folder : .\\%s \n", saveDirName);
 		else
 			printf("\nCan not delete folder, the folder may occupied.\n");
@@ -335,30 +339,38 @@ bool CamCapture::capture(int camNum, int width, int heigth, double fps, char sav
 }
 
 
-void CamCapture::showImgsOneWindow(vector<Mat>& Images, Mat& dst, int rows)
+void CamCapture::showImgsOneWindow(vector<Mat>& Images, Mat& dst, int width, int height, int cols, int rows)
 {
-	int Num = int(Images.size());				//µÃµ½VectorÈİÆ÷ÖĞÍ¼Æ¬¸öÊı
+	const int imgNum = Images.size();				//µÃµ½VectorÈİÆ÷ÖĞÍ¼Æ¬¸öÊı
 											//Éè¶¨°üº¬ÕâĞ©Í¼Æ¬µÄ´°¿Ú´óĞ¡£¬ÕâÀï¶¼ÊÇBGR3Í¨µÀ£¬Èç¹û×ö»Ò¶Èµ¥Í¨µÀ£¬ÉÔÎ¢¸ÄÒ»ÏÂÏÂÃæÕâĞĞ´úÂë¾Í¿ÉÒÔ
 	//Mat Window(1280 * ((Num - 1) / rows + 1), 720 * rows, CV_8UC3, Scalar(0, 0, 0));
-	Mat Window(Size(1280 * 3, 720 * 2), CV_8UC3, Scalar(0, 0, 0));
-	Mat Std_Image;										//´æ·Å±ê×¼´óĞ¡µÄÍ¼Æ¬
+	Mat Window(Size(width * cols, height * rows), CV_8UC3, Scalar(0, 0, 0));
+	//Mat Std_Image;										//´æ·Å±ê×¼´óĞ¡µÄÍ¼Æ¬
 	Mat imageROI;										//Í¼Æ¬·ÅÖÃÇøÓò
-	Size Std_Size = Size(1280, 720);						//Ã¿¸öÍ¼Æ¬ÏÔÊ¾´óĞ¡300*300
+	//Size Std_Size = Size(1280, 720);						//Ã¿¸öÍ¼Æ¬ÏÔÊ¾´óĞ¡300*300
 	int x_Begin = 0;
 	int y_Begin = 0;
-	for (int i = 0; i < Num; i++)
+	for (int i = 0; i < imgNum; i++)
 	{
-		x_Begin = (i % rows)*Std_Size.width;			//Ã¿ÕÅÍ¼Æ¬ÆğÊ¼×ø±ê
-		y_Begin = (i / rows)*Std_Size.height;
+		x_Begin = (i % cols)*width;			//Ã¿ÕÅÍ¼Æ¬ÆğÊ¼×ø±ê
+		y_Begin = (i / cols)*height;
 		//resize(Images[i], Std_Image, Std_Size, 0, 0, INTER_LINEAR);						//½«Í¼ÏñÉèÎª±ê×¼´óĞ¡
 																						//½«ÆäÌùÔÚWindowÉÏ
-		imageROI = Window(Rect(x_Begin, y_Begin, Std_Size.width, Std_Size.height));
+		imageROI = Window(Rect(x_Begin, y_Begin, width, height));
 		Images[i].copyTo(imageROI);
 	}
 	dst = Window;
 }
 
-
+void CamCapture::printStringOnImgCenter(Mat& img, const String& text, int fontFace, double fontScale, Scalar color,
+	int thickness, int lineType, bool bottomLeftOrigin)
+{
+	Size textSize = getTextSize(text, fontFace, fontScale, thickness, 0);
+	Point origin;
+	origin.x = img.cols / 2.0 - textSize.width / 2.0;
+	origin.y = img.rows / 2.0 + textSize.height / 2.0;
+	putText(img, text, origin, fontFace, fontScale, color, thickness, lineType, bottomLeftOrigin);
+}
 
 
 void stitch(vector<Mat> imgs, Mat& resultMat)
@@ -425,3 +437,92 @@ void stitch2(Mat& srcImage1, Mat& srcImage2, Mat& panorama)				//ÁíÒ»ÖÖÏàËÆµÄÆ´½
 	Mat roi(panorama, Rect(0, 0, srcImage1.cols, srcImage1.rows));
 	srcImage1.copyTo(roi);
 }
+
+//int listDevices(vector<string>& list) {
+//
+//	//COM Library Intialization
+//	//comInit();
+//
+//	//if (!silent)printf("\nVIDEOINPUT SPY MODE!\n\n");
+//
+//
+//	ICreateDevEnum *pDevEnum = NULL;
+//	IEnumMoniker *pEnum = NULL;
+//	int deviceCounter = 0;
+//	CoInitialize(NULL);
+//	HRESULT hr = CoCreateInstance(CLSID_SystemDeviceEnum, NULL,
+//		CLSCTX_INPROC_SERVER, IID_ICreateDevEnum,
+//		reinterpret_cast<void**>(&pDevEnum));
+//
+//
+//	if (SUCCEEDED(hr))
+//	{
+//		// Create an enumerator for the video capture category.
+//		hr = pDevEnum->CreateClassEnumerator(
+//			CLSID_VideoInputDeviceCategory,
+//			&pEnum, 0);
+//
+//		if (hr == S_OK) {
+//
+//			//if (!silent)printf("SETUP: Looking For Capture Devices\n");
+//			IMoniker *pMoniker = NULL;
+//
+//			while (pEnum->Next(1, &pMoniker, NULL) == S_OK) {
+//
+//				IPropertyBag *pPropBag;
+//				hr = pMoniker->BindToStorage(0, 0, IID_IPropertyBag,
+//					(void**)(&pPropBag));
+//
+//				if (FAILED(hr)) {
+//					pMoniker->Release();
+//					continue;  // Skip this one, maybe the next one will work.
+//				}
+//
+//
+//				// Find the description or friendly name.
+//				VARIANT varName;
+//				VariantInit(&varName);
+//				hr = pPropBag->Read(L"Description", &varName, 0);
+//
+//				if (FAILED(hr)) hr = pPropBag->Read(L"FriendlyName", &varName, 0);
+//
+//				if (SUCCEEDED(hr)) {
+//
+//					hr = pPropBag->Read(L"FriendlyName", &varName, 0);
+//
+//					int count = 0;
+//					char tmp[255] = { 0 };
+//					//int maxLen = sizeof(deviceNames[0]) / sizeof(deviceNames[0][0]) - 2;
+//					while (varName.bstrVal[count] != 0x00 && count < 255) {
+//						tmp[count] = (char)varName.bstrVal[count];
+//						count++;
+//					}
+//					list.push_back(tmp);
+//					//deviceNames[deviceCounter][count] = 0;
+//
+//					//if (!silent)printf("SETUP: %i) %s \n", deviceCounter, deviceNames[deviceCounter]);
+//				}
+//
+//				pPropBag->Release();
+//				pPropBag = NULL;
+//
+//				pMoniker->Release();
+//				pMoniker = NULL;
+//
+//				deviceCounter++;
+//			}
+//
+//			pDevEnum->Release();
+//			pDevEnum = NULL;
+//
+//			pEnum->Release();
+//			pEnum = NULL;
+//		}
+//
+//		//if (!silent)printf("SETUP: %i Device(s) found\n\n", deviceCounter);
+//	}
+//
+//	//comUnInit();
+//
+//	return deviceCounter;
+//}
