@@ -61,7 +61,7 @@ bool CamCapture::capture(int camNum, int width, int heigth, int cols, int rows, 
 	vector<Mat> imgs;
 	vector<int> errCamNum;																//其中保存 未连接 和 超时 的 摄像头 的 index
 	vector<int>::iterator iter;															//指向vector<int>的迭代器
-
+	
 	printStringOnImgCenter(noSignalImg, "No Signal", FONT_HERSHEY_SIMPLEX, 4, Scalar(255, 255, 255), 10);
 	namedWindow("No signal", WINDOW_KEEPRATIO);
 	imshow("No signal", noSignalImg);
